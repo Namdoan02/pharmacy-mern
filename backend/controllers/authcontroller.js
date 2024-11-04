@@ -85,7 +85,7 @@ const loginUser = async (req, res) => {
     );
     return res
       .status(200)
-      .cookie("access_token", token, {
+      .cookie("authorization", token, {
         httpOnly: true, // Secure the cookie to be accessible only by the server
         secure: process.env.NODE_ENV === "production", // Send cookie only over HTTPS in production
         sameSite: "strict", // CSRF protection
@@ -99,44 +99,27 @@ const loginUser = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  // Lấy token từ tiêu đề Authorization
-  const token = req.headers['authorization']?.split(' ')[1]; // Giả sử là Bearer token
+  const token = req.headers['authorization']?.split(' ')[1];
 
-  // Kiểm tra token
   if (!token) {
       return res.status(401).json({ success: false, message: "No token provided" });
   }
 
   try {
-      //console.log("Token retrieved:", token); // Log token để debug
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); // Giải mã trực tiếp mà không cần promise
 
-      // Giải mã token
-      const decoded = await new Promise((resolve, reject) => {
-          jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-              if (err) {
-                  console.error("Token verification error:", err);
-                  return reject(err); // Chuyển lỗi ra bên ngoài
-              }
-              resolve(decoded);
-          });
-      });
+      const user = await User.findById(decoded.id).select("name email");
 
-      // Lấy thông tin người dùng từ cơ sở dữ liệu
-      const userId = decoded.id; // Sử dụng ID từ token đã giải mã
-      const user = await User.findById(userId).select("name email");
-
-      // Kiểm tra xem người dùng có tồn tại hay không
       if (!user) {
           return res.status(404).json({ success: false, message: "User not found" });
       }
 
-      // Trả về thông tin hồ sơ
       res.json({ success: true, profile: user });
   } catch (error) {
       console.error("Error retrieving profile:", error);
 
       if (error.name === 'TokenExpiredError') {
-          return res.status(401).json({ success: false, message: "Session expired. Please log in again." }); // Xử lý khi token hết hạn
+          return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
       }
 
       res.status(403).json({ success: false, message: error.message || "An error occurred" });
