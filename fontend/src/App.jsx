@@ -13,10 +13,6 @@ export default function App() {
   return (
     <UserContextProvider>
       <div className="flex h-screen w-full text-gray-100 overflow-hidden">
-        {/* <div className="fixed-inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-600 to-gray-800"></div>
-          <div className="absolute inset-0 backdrop-blur-sm"></div>
-        </div> */}
         <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
         <Routes>
           <Route path="/" element={<Home />} />
