@@ -1,88 +1,45 @@
-const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { get } = require("mongoose");
-// Hàm xác thực
+const User = require("../models/UserModel"); // Ensure User model is correctly required
+
+// Placeholder function for basic route testing
 const auth = (req, res) => {
   res.json("Pharmacy");
 };
 
-const registerUser = async (req, res) => {
-  try {
-    const { name, email, password, confirmPassword } = req.body;
-
-    // Kiểm tra xem các trường bắt buộc đã được điền chưa
-    if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({ msg: "Vui lòng điền đầy đủ các trường" });
-    }
-
-    // Kiểm tra độ dài mật khẩu
-    if (password.length < 6) {
-      return res.status(400).json({ msg: "Mật khẩu phải dài ít nhất 6 ký tự" });
-    }
-
-    // Kiểm tra xem email đã tồn tại chưa
-    const exist = await User.findOne({ email });
-    if (exist) {
-      return res.status(400).json({ msg: "Email đã tồn tại" });
-    }
-
-    // Kiểm tra xem mật khẩu và xác nhận mật khẩu có khớp nhau không
-    if (password !== confirmPassword) {
-      return res.status(400).json({ msg: "Mật khẩu không khớp" });
-    }
-
-    // Băm mật khẩu trước khi lưu vào cơ sở dữ liệu
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 là độ khó băm
-
-    // Tạo mới người dùng
-    const user = new User({
-      name,
-      email,
-      password: hashedPassword, // Sử dụng mật khẩu đã băm
-    });
-
-    // Lưu người dùng vào cơ sở dữ liệu
-    await user.save();
-
-    return res
-      .status(201)
-      .json({ success: true, msg: "Đăng ký thành công", user });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Có lỗi xảy ra, vui lòng thử lại" }); // Thông báo lỗi chung
-  }
-};
-
-//login
-
+// Login function with JWT token generation and admin check
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body; // Chỉ cần email và password cho đăng nhập
+    const { email, password } = req.body;
 
-    // Kiểm tra xem các trường bắt buộc đã được điền chưa
+    // Check if both email and password are provided
     if (!email || !password) {
       return res.status(400).json({ msg: "Vui lòng điền đầy đủ các trường" });
     }
 
-    // Tìm người dùng theo email
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "Email không tồn tại" });
     }
 
-    // So sánh mật khẩu đã nhập với mật khẩu đã lưu
+    // Compare entered password with the hashed password in the database
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Mật khẩu không đúng" });
     }
 
-    //Tạo token JWT
+    // Check if user has admin role
+    const isAdmin = user.role === "admin";
+
+    // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email }, // Payload (dữ liệu sẽ được mã hóa trong token)
-      process.env.JWT_SECRET, // Mã bí mật để mã hóa token
-      { expiresIn: "1h" } // Thời gian hết hạn của token
+      { id: user._id, email: user.email, isAdmin }, // Payload includes admin status
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
+
+    // Set the JWT token as an HTTP-only cookie
     return res
       .status(200)
       .cookie("authorization", token, {
@@ -91,44 +48,51 @@ const loginUser = async (req, res) => {
         sameSite: "strict", // CSRF protection
         maxAge: 3600000, // 1 hour in milliseconds
       })
-      .json({ success: true, msg: "Đăng nhập thành công", user, token });
+      .json({ success: true, msg: "Đăng nhập thành công", isAdmin, user: { name: user.name, email: user.email, role: user.role }, token });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Có lỗi xảy ra, vui lòng thử lại" }); // Thông báo lỗi chung
+    console.error("Login error:", err);
+    return res.status(500).json({ msg: "Có lỗi xảy ra, vui lòng thử lại" });
   }
 };
 
+// Profile retrieval function with token verification and admin check
 const getProfile = async (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
+  // Retrieve token from authorization header
+  const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
-      return res.status(401).json({ success: false, message: "No token provided" });
+    return res.status(401).json({ success: false, message: "No token provided" });
   }
 
   try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET); // Giải mã trực tiếp mà không cần promise
+    // Verify and decode the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      const user = await User.findById(decoded.id).select("name email");
+    // Find the user by the ID from the decoded token
+    const user = await User.findById(decoded.id).select("name email role");
 
-      if (!user) {
-          return res.status(404).json({ success: false, message: "User not found" });
-      }
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-      res.json({ success: true, profile: user });
+    // Check if user is an admin
+    const isAdmin = user.role === "admin";
+
+    res.json({ success: true, profile: user, isAdmin });
   } catch (error) {
-      console.error("Error retrieving profile:", error);
+    console.error("Error retrieving profile:", error);
 
-      if (error.name === 'TokenExpiredError') {
-          return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
-      }
+    // Handle token expiration and other errors
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
+    }
 
-      res.status(403).json({ success: false, message: error.message || "An error occurred" });
+    res.status(403).json({ success: false, message: error.message || "An error occurred" });
   }
 };
 
 module.exports = {
   auth,
-  registerUser,
   loginUser,
   getProfile,
 };

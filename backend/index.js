@@ -24,7 +24,8 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 });
  
 
-app.use("/api/auth", authRouter); // Use the auth router
+app.use("/api/auth/", authRouter);
+
 
 // Start the server
 app.listen(PORT, () => {
