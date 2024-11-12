@@ -24,20 +24,23 @@ const getUserById = async (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
-  const { name, role, email, status, password } = req.body;
+  const { name, role, email, phone, password } = req.body;
 
   // Check if all required fields are provided
-  if (!name || !role || !email || !status || !password) {
+  if (!name || !role || !email || !phone || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
-
+  const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       name,
       role,
       email,
-      status,
+      phone,
       password: hashedPassword, // Use hashed password
     });
 
@@ -58,7 +61,7 @@ const updateUser = async (req, res) => {
     if (req.body.name) user.name = req.body.name;
     if (req.body.role) user.role = req.body.role;
     if (req.body.email) user.email = req.body.email;
-    if (req.body.status) user.status = req.body.status;
+    if (req.body.phone) user.status = req.body.phone;
 
     // Hash the new password if it is provided
     if (req.body.password) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast"; // Nếu bạn sử dụng react-hot-toast để thông báo
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Nếu bạn sử dụng react-hot-toast để thông báo
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", 
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -79,29 +79,13 @@ const Login = () => {
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
           </div>
-          <div className="flex items-center justify-between text-white">
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" className="form-checkbox" />
-              <span>Lưu mật khẩu</span>
-            </label>
-            <a href="#" className="text-purple-500 hover:underline">
-              Quên mật khẩu?
-            </a>
-          </div>
           <button
             type="submit"
             className="w-full bg-purple-500 text-white p-3 rounded hover:bg-purple-600"
           >
             Đăng nhập
           </button>
-          <div className="text-center text-white mt-4">
-            <p>
-              Bạn chưa có tài khoản?{" "}
-              <Link to="/register" className="text-purple-500 hover:underline">
-                Tạo tài khoản
-              </Link>
-            </p>
-          </div>
+          <div className="text-center text-white mt-4"></div>
         </form>
       </div>
     </div>

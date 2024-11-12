@@ -1,7 +1,8 @@
 import { useContext, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./index.css";
-import { Toaster } from "react-hot-toast";
+import { ToastContainer} from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 import { UserContextProvider, UserContext } from "../context/usercontext.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
@@ -10,7 +11,8 @@ import Register from "./pages/Register.jsx";
 import Users from "./pages/Users.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
-import CreateUser from "./pages/createUser.jsx";
+import CreateUser from "./pages/CreateUser.jsx";
+import WarehouseEntry from "./pages/Warehouse.jsx";
 
 export default function App() {
   return (
@@ -72,9 +74,8 @@ function MainLayout() {
       {!isLoginPage && <Sidebar />}
       <div className={`flex flex-col ${isLoginPage ? "w-full" : "w-full"}`}>
         {!isLoginPage && (
-          <Header username={user?.name} onLogout={handleLogout} />
+          <Header userRole={user?.role} username={user?.name} onLogout={handleLogout} />
         )}
-        <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
         <div className="flex-grow overflow-auto">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -82,9 +83,11 @@ function MainLayout() {
             <Route path="/product" element={<Product />} />
             <Route path="/register" element={<Register />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/users/create" element={<CreateUser />} />
+            <Route path="/create" element={<CreateUser />} />
+            <Route path="/warehouse" element={<WarehouseEntry />} />
           </Routes>
         </div>
+        <ToastContainer />
       </div>
     </div>
   );

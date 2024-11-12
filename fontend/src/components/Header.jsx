@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({ username, onLogout }) => {
+const Header = ({ username, userRole, onLogout }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // You may pass search functionality here
+    // Implement search functionality if needed
   };
 
   const toggleDropdown = () => {
@@ -19,10 +19,7 @@ const Header = ({ username, onLogout }) => {
     <header className="bg-gray-700 shadow-lg border-b border-gray-600">
       <div className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Search Input */}
-        <form
-          onSubmit={handleSearch}
-          className="flex items-center flex-grow mr-6"
-        >
+        <form onSubmit={handleSearch} className="flex items-center flex-grow mr-6">
           <div className="relative w-full max-w-md">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
@@ -44,11 +41,15 @@ const Header = ({ username, onLogout }) => {
         </form>
 
         <div className="ml-auto flex items-center space-x-4 text-white font-medium">
-          {username ? (
+          {username && userRole ? (
             <>
-              <button className="px-4 py-2 bg-red-500 rounded-full text-white font-semibold hover:bg-red-600">
-                {username}
-              </button>
+             <div
+                className={`px-4 py-2 rounded-full text-white font-semibold ${
+                  userRole === "admin" ? "bg-red-500" : "bg-blue-500"
+                }`}
+              >
+                {userRole}
+              </div>
 
               {/* Dropdown for Logout */}
               <div className="relative">

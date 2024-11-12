@@ -29,7 +29,6 @@ const SIDEBAR_ITEMS = [
     name: "Danh mục thuốc",
     icon: List,
     color: "#FFFFFF",
-    href: "/",
     children: [
       {
         name: "Dược phẩm",
@@ -85,7 +84,7 @@ const SIDEBAR_ITEMS = [
     name: "Nhập kho",
     icon: FolderInput,
     color: "#6666FF",
-    href: "/",
+    href: "/warehouse",
   },
   {
     name: "Xuất kho",
@@ -123,7 +122,7 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      <div className="h-full bg-gray-700 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-600 overflow-y-auto hide-scrollbar">
+      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-600 overflow-y-auto hide-scrollbar">
         
         {/* Toggle Button */}
         <motion.button
