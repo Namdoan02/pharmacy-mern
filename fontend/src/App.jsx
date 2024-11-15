@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./index.css";
 import { ToastContainer} from 'react-toastify';
-  import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css';
 import { UserContextProvider, UserContext } from "../context/usercontext.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
@@ -11,8 +11,10 @@ import Register from "./pages/Register.jsx";
 import Users from "./pages/Users.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
-import CreateUser from "./pages/CreateUser.jsx";
+import CreateUser from "./components/createUser.jsx";
 import WarehouseEntry from "./pages/Warehouse.jsx";
+import Supplier from "./pages/Supplier.jsx";
+import EditUser from "./components/updateUser.jsx";
 
 export default function App() {
   return (
@@ -83,8 +85,10 @@ function MainLayout() {
             <Route path="/product" element={<Product />} />
             <Route path="/register" element={<Register />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/create" element={<CreateUser />} />
+            <Route path="/users/create" element={<CreateUser />} />
+            <Route path="/edit/:id" element={<EditUser />} />
             <Route path="/warehouse" element={<WarehouseEntry />} />
+            <Route path="/supplier" element={<Supplier/>} />
           </Routes>
         </div>
         <ToastContainer />

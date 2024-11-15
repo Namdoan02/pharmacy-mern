@@ -22,7 +22,7 @@ const SIDEBAR_ITEMS = [
   {
     name: "Trang chủ",
     icon: House,
-    color: "#6666FF",
+    color: "#0066FF",
     href: "/",
   },
   {
@@ -54,7 +54,7 @@ const SIDEBAR_ITEMS = [
     name: "Nhà cung cấp",
     icon: HousePlus,
     color: "#FF3366",
-    href: "/",
+    href: "/supplier",
   },
   {
     name: "Khách hàng",
@@ -63,7 +63,7 @@ const SIDEBAR_ITEMS = [
     href: "/",
   },
   {
-    name: "Nhân viên",
+    name: "Người dùng",
     icon: Users,
     color: "#FF00CC",
     href: "/users",

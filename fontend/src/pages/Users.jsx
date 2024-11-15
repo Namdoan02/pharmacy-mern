@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import CreateUser from "./CreateUser"; // Import the CreateUser component
-import { Trash2 } from "lucide-react";
+import CreateUser from "../components/createUser";
+import EditUser from "../components/updateUser";
+import { Trash2, UserRoundPen } from "lucide-react";
 import { toast } from "react-toastify";
 
 function UserTable() {
   const [users, setUsers] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState(null);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -28,11 +30,52 @@ function UserTable() {
     setActiveDropdown(activeDropdown === index ? null : index);
   };
 
+  const handleEdit = (user) => {
+    setEditUser(user); // Set the selected user for editing
+    setIsEditModalOpen(true); // Open the edit modal
+  };
+
+  const handleSave = async (updatedUser) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/update/${updatedUser._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedUser),
+      });
+  
+      if (response.ok) {
+        toast.success("Người dùng đã được cập nhật thành công!");
+  
+        // Re-fetch updated user list
+        const fetchUsers = async () => {
+          try {
+            const response = await fetch("http://localhost:5000/api/users/users");
+            if (!response.ok) {
+              throw new Error("Failed to fetch updated user list");
+            }
+            const data = await response.json();
+            setUsers(data); // Update the user list in state
+          } catch (error) {
+            console.error("Error fetching updated user list:", error);
+          }
+        };
+  
+        await fetchUsers(); // Refresh the user list
+        setIsEditModalOpen(false); // Close the modal
+      } 
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Đã xảy ra lỗi khi cập nhật người dùng.");
+    }
+  };
+
   const handleDelete = async (userId) => {
     const deleteUser = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/users/users/${userId}`,
+          `http://localhost:5000/api/users/delete/${userId}`,
           {
             method: "DELETE",
           }
@@ -63,13 +106,13 @@ function UserTable() {
               }}
               className="px-3 py-1 bg-red-500 text-white rounded"
             >
-              Confirm
+              Xác nhận
             </button>
             <button
               onClick={() => toast.dismiss(t.id)}
               className="px-3 py-1 bg-gray-300 rounded"
             >
-              Cancel
+              Hủy
             </button>
           </div>
         </div>
@@ -138,15 +181,13 @@ function UserTable() {
                 {activeDropdown === index && (
                   <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
                     <ul className="py-1 text-gray-700">
-                      <li
-                        onClick={() => console.log("Edit user", user._id)}
+                      <div
+                        onClick={() => handleEdit(user._id)}
                         className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
-                        <span role="img" aria-label="edit" className="mr-2">
-                          ✏️
-                        </span>{" "}
-                        Edit
-                      </li>
+                        <UserRoundPen className="mr-2" />
+                        Sửa
+                      </div>
                       <div
                         onClick={() => handleDelete(user._id)}
                         className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
@@ -161,11 +202,21 @@ function UserTable() {
           ))}
         </tbody>
       </table>
-
+      {isEditModalOpen && editUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="rounded-lg w-full max-w-lg">
+          <EditUser
+            userId={editUser}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleSave}
+          />
+          </div>
+        </div>
+      )}
       {/* Modal for CreateUser form */}
       {showCreateForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="rounded-lg w-full max-w-lg ">
+          <div className="rounded-lg w-full max-w-lg">
             <CreateUser onClose={() => setShowCreateForm(false)} />
           </div>
         </div>

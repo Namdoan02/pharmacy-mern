@@ -69,8 +69,6 @@ const getProfile = async (req, res) => {
     const isAdmin = user.role === "admin";
     res.json({ success: true, profile: user, isAdmin });
   } catch (error) {
-    console.error("Error retrieving profile:", error);
-
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
     }

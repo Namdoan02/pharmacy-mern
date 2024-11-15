@@ -53,7 +53,7 @@ const CreateUser = ({ onClose }) => {
       toast.error("Mật khẩu không khớp!");
       return;
     }
-    const newUser = { name, role, email, phone, status, password };
+    const newUser = { name, role, email, phone, password };
 
     try {
       const response = await fetch("http://localhost:5000/api/users/create", {
@@ -94,6 +94,7 @@ const CreateUser = ({ onClose }) => {
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
             placeholder="Nhập tên người dùng"
+            autoComplete="name"
             required
           />
         </div>
@@ -105,6 +106,7 @@ const CreateUser = ({ onClose }) => {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
             placeholder="Nhập email"
+            autoComplete="email"
             required
           />
         </div>
@@ -115,7 +117,7 @@ const CreateUser = ({ onClose }) => {
               <input
                 type="radio"
                 name="role"
-                value="Kho"
+                value="user"
                 checked={role === "user"}
                 onChange={(e) => setRole(e.target.value)}
                 className="mr-2"
@@ -154,13 +156,14 @@ const CreateUser = ({ onClose }) => {
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
               placeholder="Nhập số điện thoại"
+              autoComplete="tel"
               required
             />
           </div>
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium">Mật khẩu</label>
             <input
-              type="password"
+              type="password" autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
@@ -171,7 +174,7 @@ const CreateUser = ({ onClose }) => {
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium">Xác nhận mật khẩu</label>
             <input
-              type="password"
+              type="password" autoComplete="off"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
