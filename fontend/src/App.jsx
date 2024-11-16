@@ -15,6 +15,8 @@ import CreateUser from "./components/createUser.jsx";
 import WarehouseEntry from "./pages/Warehouse.jsx";
 import Supplier from "./pages/Supplier.jsx";
 import EditUser from "./components/updateUser.jsx";
+import EditSupplier from "./components/updateSupplier.jsx";
+import AddSupplierForm from "./components/createSupplier.jsx";
 
 export default function App() {
   return (
@@ -89,6 +91,8 @@ function MainLayout() {
             <Route path="/edit/:id" element={<EditUser />} />
             <Route path="/warehouse" element={<WarehouseEntry />} />
             <Route path="/supplier" element={<Supplier/>} />
+            <Route path="/edit/:id" element={<EditSupplier />} />
+            <Route path="/supplier/create" element={<AddSupplierForm />} />
           </Routes>
         </div>
         <ToastContainer />
