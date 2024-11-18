@@ -53,7 +53,7 @@ const EditUser = ({ userId, onClose, onSave }) => {
     }
 
     // Prepare updated user data
-    const updatedUser = { name, role, email, phone };
+    const updatedUser = {  _id: userId,name, role, email, phone };
     if (password){updatedUser.password = password;}  // Include password if it’s updated
 
     try {
@@ -66,7 +66,6 @@ const EditUser = ({ userId, onClose, onSave }) => {
       });
 
       if (response.ok) {
-        toast.success("Người dùng đã được cập nhật thành công!");
         onSave(updatedUser); // Notify parent to refresh the user list
         onClose(); // Close the modal
       } else {

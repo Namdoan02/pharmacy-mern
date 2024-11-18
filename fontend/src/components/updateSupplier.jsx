@@ -12,9 +12,9 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
 
   // Fetch the supplier's data by ID
   useEffect(() => {
-    if (!supplierId || typeof supplierId !== "string" || !/^[a-f\d]{24}$/i.test(supplierId)) {
-      console.error("Invalid Supplier ID:", supplierId);
-      toast.error("Supplier ID is invalid or not provided");
+    if (!supplierId) {
+      console.error("No supplierId provided to EditUser component");
+      toast.error("No supplier ID provided");
       return;
     }
     const fetchSupplierById = async () => {
@@ -23,9 +23,9 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
           `http://localhost:5000/api/suppliers/suppliers/${supplierId}`
         );
         if (!response.ok) {
-          const errorMessage = await response.json();
+          
           throw new Error(
-            `Failed to fetch supplier data: ${errorMessage.message}`
+            `Failed to fetch supplier data: ${supplierId}`
           );
         }
 
@@ -62,6 +62,7 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
 
     // Prepare updated supplier data
     const updatedSupplier = {
+      _id: supplierId,
       supplierName,
       contactPerson,
       taxCode,
@@ -70,7 +71,6 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
       phoneNumber,
       address,
     };
-
     try {
       const response = await fetch(
         `http://localhost:5000/api/suppliers/update/${supplierId}`,
@@ -84,7 +84,6 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
       );
 
       if (response.ok) {
-        toast.success("Nhà cung cấp đã được cập nhật thành công!");
         onSave(updatedSupplier); // Notify parent to refresh the supplier list
         onClose(); // Close the modal
       } else {

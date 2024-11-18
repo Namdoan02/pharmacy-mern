@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AddSupplierForm from "../components/createSupplier";
 import EditSupplier from "../components/updateSupplier";
 import { Trash2, UserRoundPen } from "lucide-react";
@@ -10,7 +10,8 @@ function SupplierTable() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editSupplier, setEditSupplier] = useState(null);
-
+  const dropdownRef = useRef(null); // Ref to track the dropdown
+  const buttonRef = useRef(null); // Ref to track the button
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
@@ -26,6 +27,22 @@ function SupplierTable() {
     };
 
     fetchSuppliers();
+
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        dropdownRef.current.contains &&
+        !dropdownRef.current.contains(event.target) &&
+        buttonRef.current &&
+        buttonRef.current.contains &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setActiveDropdown(null); // Close dropdown when clicked outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside); // Listen for clicks outside
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const toggleDropdown = (index) => {
@@ -33,14 +50,35 @@ function SupplierTable() {
   };
 
   const handleEdit = (supplier) => {
+    if (!supplier || !supplier._id) {
+      console.error("Invalid supplier data:", supplier);
+      toast.error("Dữ liệu nhà cung cấp không hợp lệ hoặc thiếu ID!");
+      return;
+    }
+
+    // Log supplier object for debugging
+    console.log("Editing supplier:", supplier);
+
+    // Set supplier for editing
     setEditSupplier(supplier);
     setIsEditModalOpen(true);
   };
 
   const handleSave = async (updatedSupplier) => {
+    const supplierId = updatedSupplier._id || updatedSupplier.data?._id;
+
+    if (!supplierId) {
+      console.error(
+        "Error: Updated supplier does not contain a valid ID.",
+        updatedSupplier
+      );
+      toast.error("Dữ liệu nhà cung cấp không hợp lệ hoặc thiếu ID!");
+      return;
+    }
+
     try {
       const response = await fetch(
-        `http://localhost:5000/api/suppliers/update/${updatedSupplier._id}`,
+        `http://localhost:5000/api/suppliers/update/${supplierId}`,
         {
           method: "PUT",
           headers: {
@@ -49,26 +87,31 @@ function SupplierTable() {
           body: JSON.stringify(updatedSupplier),
         }
       );
-  
+
       if (response.ok) {
         toast.success("Nhà cung cấp đã được cập nhật thành công!");
-  
-        // Re-fetch updated supplier list
+
         const fetchSuppliers = async () => {
           try {
-            const response = await fetch("http://localhost:5000/api/suppliers/suppliers");
+            const response = await fetch(
+              "http://localhost:5000/api/suppliers/suppliers"
+            );
             if (!response.ok) {
               throw new Error("Failed to fetch updated supplier list");
             }
             const data = await response.json();
-            setSuppliers(data.data || []); // Update the supplier list in state
+            setSuppliers(data.data || []); // Cập nhật danh sách nhà cung cấp vào state
+            console.log("Updated supplier list:", data.data); // Log danh sách để kiểm tra
           } catch (error) {
             console.error("Error fetching updated supplier list:", error);
+            toast.error("Không thể tải danh sách nhà cung cấp.");
           }
         };
-  
-        await fetchSuppliers(); // Refresh the supplier list
-        setIsEditModalOpen(false); // Close the modal
+        // Fetch updated supplier list
+        await fetchSuppliers();
+
+        // Close the modal after successful update
+        setIsEditModalOpen(false);
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Không thể cập nhật nhà cung cấp");
@@ -78,7 +121,6 @@ function SupplierTable() {
       toast.error("Đã xảy ra lỗi khi cập nhật nhà cung cấp.");
     }
   };
-  
 
   const handleDelete = async (supplierId) => {
     const deleteSupplier = async () => {
@@ -178,6 +220,7 @@ function SupplierTable() {
                 <td className="px-4 py-2 border">{supplier.address}</td>
                 <td className="px-4 py-2 text-center relative">
                   <button
+                    ref={buttonRef}
                     className="text-gray-400 hover:text-gray-600"
                     onClick={() => toggleDropdown(index)}
                   >
@@ -187,7 +230,7 @@ function SupplierTable() {
                     <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
                       <ul className="py-1 text-gray-700">
                         <div
-                          onClick={() => handleEdit(supplier._id)}
+                          onClick={() => handleEdit(supplier)}
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                         >
                           <UserRoundPen className="mr-2" />
@@ -212,7 +255,7 @@ function SupplierTable() {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="rounded-lg w-full max-w-lg">
               <EditSupplier
-                supplierId={editSupplier}
+                supplierId={editSupplier._id}
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={handleSave}
               />

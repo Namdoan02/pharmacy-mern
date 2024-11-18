@@ -9,18 +9,15 @@ const getAllSuppliers = async (req, res) => {
       data: suppliers,
     });
   } catch (error) {
-    res.status(500).json({ message: "Lỗi khi lấy danh sách nhà cung cấp", error });
+    res
+      .status(500)
+      .json({ message: "Lỗi khi lấy danh sách nhà cung cấp", error });
   }
 };
 
 const getSupplierById = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Validate the ID format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid supplier ID" });
-    }
 
     // Find the supplier by ID
     const supplier = await Supplier.findById(id);
@@ -84,11 +81,19 @@ const updateSupplier = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Validate the supplier ID
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid supplier ID" });
+    // Kiểm tra xem ID có tồn tại hay không
+    if (!id) {
+      console.log("ID is missing in the request");
+      return res
+        .status(400)
+        .json({ message: "Missing supplier ID in request" });
     }
 
+    // Kiểm tra định dạng ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log("Invalid ID format:", id);
+      return res.status(400).json({ message: "Invalid supplier ID format" });
+    }
     // Find the supplier by ID
     const supplier = await Supplier.findById(id);
     if (!supplier) {
@@ -139,7 +144,6 @@ const updateSupplier = async (req, res) => {
     });
   }
 };
-
 
 const deleteSupplier = async (req, res) => {
   try {
