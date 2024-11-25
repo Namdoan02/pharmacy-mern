@@ -3,6 +3,7 @@ const cors = require("cors"); // Import the database connection function
 const authRouter = require('./router/authRouter.js');
 const userRouter = require('./router/userRouter.js')
 const supplierRouter = require("./router/supplierRouter.js"); 
+const categoryRouter = require("./router/categoryRouter.js");
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
 const PORT = 5000;
@@ -29,6 +30,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 app.use("/api/auth/", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/suppliers", supplierRouter);
+app.use("/api/categories", categoryRouter);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);

@@ -31,10 +31,10 @@ const SIDEBAR_ITEMS = [
     color: "#FFFFFF",
     children: [
       {
-        name: "Dược phẩm",
+        name: "Thuốc",
         icon: Pill,
         color: "#66CCFF",
-        href: "/sub-item-1",
+        href: "/product",
       },
       {
         name: "Nhóm sản phẩm",
@@ -46,7 +46,7 @@ const SIDEBAR_ITEMS = [
         name: "Nhóm thuốc",
         icon: ShoppingBag,
         color: "#33CCFF",
-        href: "/sub-item-3",
+        href: "/category-medicine",
       },
     ],
   },

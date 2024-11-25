@@ -184,7 +184,7 @@ function SupplierTable() {
   };
 
   return (
-    <div className="p-6 bg-gray-500 min-h-screen relative">
+    <div className="p-6 relative">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Danh sách nhà cung cấp</h1>
         <button
