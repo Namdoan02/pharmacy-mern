@@ -72,7 +72,7 @@ const SIDEBAR_ITEMS = [
     name: "Báo cáo",
     icon: DollarSign,
     color: "#FFFF00",
-    href: "/sales",
+    href: "/",
   },
   {
     name: "Đơn hàng",

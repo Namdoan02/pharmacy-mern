@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import AddMedicineCategory from "../components/createCategory";
 import EditMedicineCategory from "../components/updateCategory";
-import { Trash2, UserRoundPen } from "lucide-react";
+import { Trash2, Edit} from "lucide-react";
 import { toast } from "react-toastify";
 
 const MedicineCategoryTable = () => {
@@ -200,7 +200,7 @@ const MedicineCategoryTable = () => {
             <tr>
               <th className="px-4 py-2 text-left border">STT</th>
               <th className="px-4 py-2 text-left border">Tên Loại Thuốc</th>
-              <th className="px-4 py-2 text-left border">Mô tả</th>
+              <th className="px-4 py-2 text-left border">Mô tả chung</th>
               <th className="px-4 py-2 border">Hành động</th>
             </tr>
           </thead>
@@ -228,7 +228,7 @@ const MedicineCategoryTable = () => {
                           onClick={() => handleEdit(category)}
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                         >
-                          <UserRoundPen className="mr-2" />
+                          <Edit className="mr-2" />
                           Sửa
                         </div>
                         <div

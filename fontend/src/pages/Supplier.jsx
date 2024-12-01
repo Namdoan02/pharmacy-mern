@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import AddSupplierForm from "../components/createSupplier";
 import EditSupplier from "../components/updateSupplier";
-import { Trash2, UserRoundPen } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 
 function SupplierTable() {
@@ -31,17 +31,15 @@ function SupplierTable() {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
-        dropdownRef.current.contains &&
         !dropdownRef.current.contains(event.target) &&
         buttonRef.current &&
-        buttonRef.current.contains &&
         !buttonRef.current.contains(event.target)
       ) {
-        setActiveDropdown(null); // Close dropdown when clicked outside
+        setActiveDropdown(null);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside); // Listen for clicks outside
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -230,10 +228,11 @@ function SupplierTable() {
                     <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
                       <ul className="py-1 text-gray-700">
                         <div
+                          ref={dropdownRef}
                           onClick={() => handleEdit(supplier)}
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                         >
-                          <UserRoundPen className="mr-2" />
+                          <Edit className="mr-2" />
                           Sửa
                         </div>
                         <div

@@ -53,7 +53,7 @@ const EditMedicineCategory = ({ category, onSave, onClose }) => {
 
   return (
     <div className="p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-xl font-bold mb-4">Sửa Loại Thuốc</h2>
+      <h2 className="text-xl font-bold mb-4">Cập nhật loại thuốc</h2>
       <form>
         <div className="mb-4">
           <label className="block text-gray-700 font-medium mb-2">

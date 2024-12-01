@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CreateUser from "../components/createUser";
 import EditUser from "../components/updateUser";
-import { Trash2, UserRoundPen } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 
 function UserTable() {
@@ -10,6 +10,8 @@ function UserTable() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
+  const dropdownRef = useRef(null); // Ref to track the dropdown
+  const buttonRef = useRef(null); // Ref to track the button
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -25,7 +27,20 @@ function UserTable() {
     };
 
     fetchUsers();
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const toggleDropdown = (index) => {
     setActiveDropdown(activeDropdown === index ? null : index);
   };
@@ -37,21 +52,26 @@ function UserTable() {
 
   const handleSave = async (updatedUser) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/update/${updatedUser._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedUser),
-      });
-  
+      const response = await fetch(
+        `http://localhost:5000/api/users/update/${updatedUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedUser),
+        }
+      );
+
       if (response.ok) {
         toast.success("Người dùng đã được cập nhật thành công!");
-  
+
         // Re-fetch updated user list
         const fetchUsers = async () => {
           try {
-            const response = await fetch("http://localhost:5000/api/users/users");
+            const response = await fetch(
+              "http://localhost:5000/api/users/users"
+            );
             if (!response.ok) {
               throw new Error("Failed to fetch updated user list");
             }
@@ -61,10 +81,10 @@ function UserTable() {
             console.error("Error fetching updated user list:", error);
           }
         };
-  
+
         await fetchUsers(); // Refresh the user list
         setIsEditModalOpen(false); // Close the modal
-      } 
+      }
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error("Đã xảy ra lỗi khi cập nhật người dùng.");
@@ -173,6 +193,7 @@ function UserTable() {
               <td className="px-4 py-2">{user.phone}</td>
               <td className="px-4 py-2 text-center relative">
                 <button
+                  ref={buttonRef}
                   className="text-gray-400 hover:text-gray-600"
                   onClick={() => toggleDropdown(index)}
                 >
@@ -182,10 +203,11 @@ function UserTable() {
                   <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
                     <ul className="py-1 text-gray-700">
                       <div
+                        ref={dropdownRef}
                         onClick={() => handleEdit(user._id)}
                         className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
-                        <UserRoundPen className="mr-2" />
+                        <Edit className="mr-2" />
                         Sửa
                       </div>
                       <div
@@ -205,11 +227,11 @@ function UserTable() {
       {isEditModalOpen && editUser && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="rounded-lg w-full max-w-lg">
-          <EditUser
-            userId={editUser}
-            onClose={() => setIsEditModalOpen(false)}
-            onSave={handleSave}
-          />
+            <EditUser
+              userId={editUser}
+              onClose={() => setIsEditModalOpen(false)}
+              onSave={handleSave}
+            />
           </div>
         </div>
       )}

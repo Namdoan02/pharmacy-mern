@@ -18,6 +18,7 @@ import EditUser from "./components/updateUser.jsx";
 import EditSupplier from "./components/updateSupplier.jsx";
 import AddSupplierForm from "./components/createSupplier.jsx";
 import DrugGroup from "./pages/Category.jsx";
+import MedicineDetail from "./components/medicineDetail.jsx";
 
 export default function App() {
   return (
@@ -95,6 +96,7 @@ function MainLayout() {
             <Route path="/edit/:id" element={<EditSupplier />} />
             <Route path="/supplier/create" element={<AddSupplierForm />} />
             <Route path="/category-medicine" element={<DrugGroup />} />
+            <Route path="/medicines/:id" element={<MedicineDetail />} />
           </Routes>
         </div>
         <ToastContainer />
