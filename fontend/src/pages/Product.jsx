@@ -81,47 +81,12 @@ const MedicineTable = () => {
   };
 
   const handleSave = async (updatedMedicine) => {
-    const medicineId = updatedMedicine._id || updatedMedicine.data?._id;
-
-    if (!medicineId) {
-      console.error(
-        "Error: Updated medicine does not contain a valid ID.",
-        updatedMedicine
-      );
-      toast.error("Dữ liệu thuốc không hợp lệ hoặc thiếu ID!");
-      return;
-    }
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/medicines/update/${updatedMedicine._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedMedicine),
-        }
-      );
-  
-      if (response.ok) {
-        // Cập nhật danh sách thuốc trong state nếu cập nhật thành công
-        setMedicines((prevMedicines) =>
-          prevMedicines.map((medicine) =>
-            medicine._id === updatedMedicine._id ? updatedMedicine : medicine
-          )
-        );
-        setIsEditModalOpen(false); // Đóng modal khi lưu thành công
-        toast.success("Cập nhật thuốc thành công!"); // Hiển thị thông báo thành công
-      } else {
-        // Nếu server trả về lỗi, hiển thị thông báo lỗi chung
-        const errorData = await response.json();
-        toast.error(errorData.message || "Cập nhật thuốc thất bại.");
-      }
-    } catch (error) {
-      // Bắt lỗi khi có sự cố trong quá trình gửi request (lỗi mạng, server không phản hồi...)
-      console.error("Error updating medicine:", error);
-      toast.error("Đã xảy ra lỗi khi cập nhật thuốc. Vui lòng thử lại.");
-    }
+    setMedicines((prevMedicines) =>
+      prevMedicines.map((medicine) =>
+        medicine._id === updatedMedicine._id ? updatedMedicine : medicine
+      )
+    );
+    setIsEditModalOpen(false); // Đóng modal khi lưu thành công
   };
   
 

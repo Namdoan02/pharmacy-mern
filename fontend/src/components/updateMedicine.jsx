@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
+const EditMedicineForm = ({ medicine, onSave, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -17,7 +17,9 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
+  const medicineId = medicine._id
+  
   // Fetch categories when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -27,6 +29,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
         );
         const data = await response.json();
         setCategories(data.data); // Assuming response data has a 'data' field for categories
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -41,14 +44,15 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
   // Fetch medicine data by ID when the component mounts or when `medicineId` changes
   useEffect(() => {
     if (!medicineId) return; // Don't do anything if no medicineId
-
+    
     const fetchMedicine = async () => {
       try {
         const response = await fetch(
           `http://localhost:5000/api/medicines/medicines/${medicineId}`
         );
         const data = await response.json();
-
+        console.log(data);
+        
         if (data.data) {
           const medicine = data.data;
           setFormData({
@@ -75,13 +79,16 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    console.log(formData);
+    
   };
 
-  const handleAdd = async () => {
+  const handleUpdate = async () => {
     if (!formData.name || !formData.category) {
       toast.error("Tên thuốc và loại thuốc là bắt buộc!");
       return;
@@ -115,9 +122,9 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
   };
 
   return (
-    <div className="flex-auto text-black">
+    <div className="flex-auto text-black min-h-screen grow">
       {/* Main Content Section */}
-      <div className="bg-white p-6 rounded-lg">
+      <div className="bg-white p-6 rounded-lg item content-between flex flex-col grow">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
             Cập nhật thông tin thuốc
@@ -173,7 +180,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
           </div>
 
           {/* Liều lượng */}
-          <div className="flex flex-col">
+          <div className="flex flex-col my-1">
             <input
               type="text"
               name="dosage"
@@ -215,7 +222,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
           </div>
 
           {/* Thuốc kê đơn */}
-          <div>
+          <div className="my-1">
             <label htmlFor="prescription" className="text-sm text-gray-600">
               Thuốc kê đơn
             </label>
@@ -232,7 +239,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
           </div>
 
           {/* Quy cách đóng gói */}
-          <div className="col-span-2">
+          <div className="col-span-2 my-1">
             <input
               name="packaging"
               placeholder="Quy cách đóng gói"
@@ -243,7 +250,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
           </div>
 
           {/* Tác dụng phụ */}
-          <div className="col-span-2">
+          <div className="col-span-2 my-1">
             <input
               name="sideEffects"
               placeholder="Tác dụng phụ"
@@ -278,7 +285,7 @@ const EditMedicineForm = ({ medicineId, onSave, onClose }) => {
 
         {/* Cập nhật Thuốc Button */}
         <button
-          onClick={handleAdd}
+          onClick={handleUpdate}
           className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 w-full mt-6"
         >
           Cập nhật Thuốc
