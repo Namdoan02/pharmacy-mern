@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { UserContextProvider, UserContext } from "../context/usercontext.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
-import Product from "./pages/Product.jsx";
+import MedicineTable from "./pages/Medicine.jsx";
 import Register from "./pages/Register.jsx";
 import Users from "./pages/Users.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -19,6 +19,8 @@ import EditSupplier from "./components/updateSupplier.jsx";
 import AddSupplierForm from "./components/createSupplier.jsx";
 import DrugGroup from "./pages/Category.jsx";
 import MedicineDetail from "./components/medicineDetail.jsx";
+import EditMedicineForm from "./pages/updateMedicine.jsx";
+import CustomerTable from "./pages/Customer.jsx";
 
 export default function App() {
   return (
@@ -86,7 +88,7 @@ function MainLayout() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/product" element={<Product />} />
+            <Route path="/medicines" element={<MedicineTable />} />
             <Route path="/register" element={<Register />} />
             <Route path="/users" element={<Users />} />
             <Route path="/users/create" element={<CreateUser />} />
@@ -96,7 +98,9 @@ function MainLayout() {
             <Route path="/edit/:id" element={<EditSupplier />} />
             <Route path="/supplier/create" element={<AddSupplierForm />} />
             <Route path="/category-medicine" element={<DrugGroup />} />
-            <Route path="/medicines/:id" element={<MedicineDetail />} />
+            <Route path="/medicines/:id" component={<MedicineDetail/>} />
+            <Route path="/medicines/update/:id" element={<EditMedicineForm />} />
+            <Route path="/customers" element={<CustomerTable />} />
           </Routes>
         </div>
         <ToastContainer />

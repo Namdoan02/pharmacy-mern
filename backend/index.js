@@ -5,6 +5,8 @@ const userRouter = require('./router/userRouter.js')
 const supplierRouter = require("./router/supplierRouter.js"); 
 const categoryRouter = require("./router/categoryRouter.js");
 const medicineRouter = require("./router/medicineRouter.js");
+const importDataRouter = require('./router/importDataRouter.js');
+const customerRouter = require('./router/customerRouter.js');
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
 const PORT = 5000;
@@ -33,6 +35,8 @@ app.use("/api/users", userRouter);
 app.use("/api/suppliers", supplierRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/medicines", medicineRouter);
+app.use('/api/import-data', importDataRouter);
+app.use('/api/customers', customerRouter);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);

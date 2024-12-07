@@ -1,38 +1,38 @@
 import { useEffect, useState, useRef } from "react";
-import AddMedicineForm from "../components/createMedicine";
 import { Trash2, Edit, Eye } from "lucide-react"; // Import Eye icon để xem chi tiết
 import { toast } from "react-toastify";
-import EditMedicineForm from "../components/updateMedicine";
-import MedicineDetail from "../components/medicineDetail"; // Đảm bảo bạn có component này
+import { Link } from "react-router-dom";
+import  AddMedicineForm from "../components/createMedicine.jsx";
+import MedicineDetail from "../components/medicineDetail.jsx";
+
 
 const MedicineTable = () => {
   const [medicines, setMedicines] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [editMedicine, setEditMedicine] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // Trạng thái hiển thị modal chi tiết
   const [selectedMedicine, setSelectedMedicine] = useState(null); // Thông tin thuốc được chọn
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+  // const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/medicines/medicines");
-    
+
         if (!response.ok) {
           const errorData = await response.text(); // Lấy text nếu không phải JSON
           console.error("Error fetching medicines:", errorData);
           toast.error("Lỗi khi tải danh sách thuốc.");
           return;
         }
-    
+
         const contentType = response.headers.get("Content-Type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("Dữ liệu trả về không phải JSON.");
         }
-    
+
         const { data } = await response.json();
         const formattedMedicines = data.map((medicine) => ({
           name: medicine.name,
@@ -41,7 +41,7 @@ const MedicineTable = () => {
           quantity: medicine.quantity,
           _id: medicine._id // Ensure we are storing the medicine ID.
         }));
-    
+
         setMedicines(formattedMedicines);
       } catch (error) {
         console.error("Error fetching medicines:", error);
@@ -75,21 +75,6 @@ const MedicineTable = () => {
     toast.success("Thêm thuốc thành công!");
   };
 
-  const handleEdit = (medicine) => {
-    setEditMedicine(medicine);
-    setIsEditModalOpen(true);
-  };
-
-  const handleSave = async (updatedMedicine) => {
-    setMedicines((prevMedicines) =>
-      prevMedicines.map((medicine) =>
-        medicine._id === updatedMedicine._id ? updatedMedicine : medicine
-      )
-    );
-    setIsEditModalOpen(false); // Đóng modal khi lưu thành công
-  };
-  
-
   const handleDelete = async (medicineId) => {
     const response = await fetch(
       `http://localhost:5000/api/medicines/delete/${medicineId}`,
@@ -110,6 +95,11 @@ const MedicineTable = () => {
     setSelectedMedicine(medicine);
     setIsDetailModalOpen(true); // Mở modal chi tiết
   };
+
+  // // Hàm chuyển hướng đến trang chỉnh sửa thuốc
+  // const handleEdit = (medicineId) => {
+  //   navigate(`/medicines/update/${medicineId}`); // Chuyển hướng đến trang sửa thuốc với ID của thuốc
+  // };
 
   return (
     <div className="p-6 relative">
@@ -157,11 +147,14 @@ const MedicineTable = () => {
                     >
                       <ul className="py-1 text-gray-700">
                         <div
-                          onClick={() => handleEdit(medicine)}
+                           // Sử dụng hàm handleEdit để chuyển hướng
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                         >
-                          <Edit className="mr-2" />
-                          Sửa
+                        <Edit className="mr-2" />
+                          {/* Thay thế button "Sửa" bằng Link */}
+                          <Link to={`/medicines/update/${medicine._id}`} className="text-blue-500">
+                            Sửa
+                          </Link>
                         </div>
                         <div
                           onClick={() => handleDelete(medicine._id)}
@@ -183,19 +176,6 @@ const MedicineTable = () => {
             ))}
           </tbody>
         </table>
-
-        {/* Edit Modal */}
-        {isEditModalOpen && editMedicine && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="rounded-lg w-full max-w-lg bg-white p-6 shadow-xl">
-              <EditMedicineForm
-                medicine={editMedicine}
-                onClose={() => setIsEditModalOpen(false)}
-                onSave={handleSave}
-              />
-            </div>
-          </div>
-        )}
 
         {/* Add Medicine Modal */}
         {showCreateForm && (
