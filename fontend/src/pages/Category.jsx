@@ -1,19 +1,17 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import AddMedicineCategory from "../components/createCategory";
 import EditMedicineCategory from "../components/updateCategory";
-import { Trash2, Edit} from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 
 const MedicineCategoryTable = () => {
   const [categories, setCategories] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
-  const dropdownRef = useRef(null);
-  const buttonRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Số lượng mục trên mỗi trang
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -29,41 +27,19 @@ const MedicineCategoryTable = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("Error fetching categories:", errorData);
           toast.error(errorData.message || "Failed to fetch categories");
           return;
         }
 
         const data = await response.json();
-        console.log("Fetched Categories:", data); // Debug the response
         setCategories(data.data || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+      } catch {
         toast.error("Failed to fetch categories");
       }
     };
 
     fetchCategories();
-
-    // Handle clicks outside of dropdown
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const toggleDropdown = (index) => {
-    setActiveDropdown(activeDropdown === index ? null : index);
-  };
 
   const handleAddCategory = (newCategory) => {
     setCategories([...categories, newCategory]);
@@ -79,10 +55,6 @@ const MedicineCategoryTable = () => {
     const categoryId = updatedCategory._id || updatedCategory.data?._id;
 
     if (!categoryId) {
-      console.error(
-        "Error: Updated category does not contain a valid ID.",
-        updatedCategory
-      );
       toast.error("Dữ liệu loại thuốc không hợp lệ hoặc thiếu ID!");
       return;
     }
@@ -100,32 +72,21 @@ const MedicineCategoryTable = () => {
       );
 
       if (response.ok) {
-        // Fetch the updated category list
         const fetchCategories = async () => {
-          try {
-            const response = await fetch(
-              "http://localhost:5000/api/categories/categories"
-            );
-            if (!response.ok) {
-              throw new Error("Failed to fetch updated category list");
-            }
-            const data = await response.json();
-            setCategories(data.data || []); // Update the category list in state
-            console.log("Updated category list:", data.data); // Log the list for debugging
-          } catch (error) {
-            console.error("Error fetching updated category list:", error);
-            toast.error("Không thể tải danh sách loại thuốc.");
-          }
+          const response = await fetch(
+            "http://localhost:5000/api/categories/categories"
+          );
+          const data = await response.json();
+          setCategories(data.data || []);
         };
 
-        await fetchCategories(); // Fetch and update the category list
-        setIsEditModalOpen(false); // Close the modal after successful update
+        await fetchCategories();
+        setIsEditModalOpen(false);
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Không thể cập nhật loại thuốc.");
       }
-    } catch (error) {
-      console.error("Error updating category:", error);
+    } catch {
       toast.error("Đã xảy ra lỗi khi cập nhật loại thuốc.");
     }
   };
@@ -135,140 +96,204 @@ const MedicineCategoryTable = () => {
       try {
         const response = await fetch(
           `http://localhost:5000/api/categories/delete/${categoryId}`,
-          { method: "DELETE" }
+          {
+            method: "DELETE",
+          }
         );
-
+  
         if (response.ok) {
-          // Update the state to remove the deleted category
           setCategories((prevCategories) =>
             prevCategories.filter((category) => category._id !== categoryId)
           );
-
-          toast.success("Loại thuốc đã được xóa thành công!");
+          toast.success("Xóa loại thuốc thành công!", {
+            duration: 5000, // Toast tự động đóng sau 5 giây
+          });
         } else {
           const errorData = await response.json();
-          console.error("Failed to delete category:", errorData);
-          toast.error(errorData.message || "Xóa loại thuốc thất bại.");
+          toast.error(
+            errorData.message || "Xóa loại thuốc thất bại.",
+            { duration: 5000 }
+          );
         }
       } catch (error) {
         console.error("Error deleting category:", error);
-        toast.error("Đã xảy ra lỗi khi xóa loại thuốc.");
+        toast.error("Đã xảy ra lỗi khi xóa loại thuốc.", {
+          duration: 5000,
+        });
       }
     };
-
+  
     toast(
       (t) => (
         <div>
-          <p>Bạn có chắc chắn muốn xóa loại thuốc này không?</p>
+          <p>Bạn có chắc muốn xóa loại thuốc này?</p>
           <div className="flex justify-center space-x-2">
             <button
               onClick={() => {
                 deleteCategory();
-                toast.dismiss(t.id);
+                toast.dismiss(t.id); // Đóng toast xác nhận
               }}
-              className="px-3 py-1 bg-red-500 text-white rounded"
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
             >
               Xác nhận
             </button>
             <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 bg-gray-300 rounded"
+              onClick={() => toast.dismiss(t.id)} // Đóng toast xác nhận
+              className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition"
             >
               Hủy
             </button>
           </div>
         </div>
       ),
-      { position: "top-center", autoClose: false }
+      {
+        position: "top-center", // Hiển thị ở giữa trên cùng
+        duration: 5000, // Toast tự động đóng sau 5 giây
+        style: {
+          background: "#ffffff",
+          color: "#333",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          padding: "16px",
+        },
+      }
     );
   };
 
+  // Tính toán dữ liệu hiển thị
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
+
   return (
-    <div className="p-6 relative ">
+    <div className="p-6 relative bg-gray-100 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Danh sách loại thuốc</h1>
+        <h1 className="text-3xl font-semibold text-gray-800">
+          Danh sách loại thuốc
+        </h1>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg"
+          className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-300"
         >
           Tạo mới
         </button>
       </div>
-      <div className="bg-slate-300 p-3 border rounded-md text-black">
-        <table className="min-w-full bg-white border rounded-lg shadow-lg">
-          <thead>
+
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full text-left border-collapse">
+          <thead className="bg-gray-200">
             <tr>
-              <th className="px-4 py-2 text-left border">STT</th>
-              <th className="px-4 py-2 text-left border">Tên Loại Thuốc</th>
-              <th className="px-4 py-2 text-left border">Mô tả chung</th>
-              <th className="px-4 py-2 border">Hành động</th>
+              <th className="px-6 py-4 text-gray-600 font-medium text-sm uppercase tracking-wider border-b">
+                STT
+              </th>
+              <th className="px-6 py-4 text-gray-600 font-medium text-sm uppercase tracking-wider border-b">
+                Tên Loại Thuốc
+              </th>
+              <th className="px-6 py-4 text-gray-600 font-medium text-sm uppercase tracking-wider border-b">
+                Mô tả chung
+              </th>
+              <th className="px-6 py-4 text-gray-600 font-medium text-sm uppercase tracking-wider border-b">
+                Hành động
+              </th>
             </tr>
           </thead>
-          <tbody>
-            {categories.map((category, index) => (
-              <tr key={category.id || index} className="border-t">
-                <td className="px-4 py-2 border">{index + 1}</td>
-                <td className="px-4 py-2 border">{category.name}</td>
-                <td className="px-4 py-2 border">{category.description}</td>
-                <td className="px-4 py-2 text-center relative">
-                  <button
-                    ref={buttonRef}
-                    className="text-gray-400 hover:text-gray-600"
-                    onClick={() => toggleDropdown(index)}
-                  >
-                    •••
-                  </button>
-                  {activeDropdown === index && (
-                    <div
-                      ref={dropdownRef}
-                      className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10"
-                    >
-                      <ul className="py-1 text-gray-700">
-                        <div
-                          onClick={() => handleEdit(category)}
-                          className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <Edit className="mr-2" />
-                          Sửa
-                        </div>
-                        <div
-                          onClick={() => handleDelete(category._id)}
-                          className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
-                        >
-                          <Trash2 className="mr-2" /> Xóa
-                        </div>
-                      </ul>
+          <tbody className="bg-white">
+            {currentCategories.length > 0 ? (
+              currentCategories.map((category, index) => (
+                <tr
+                  key={category._id || index}
+                  className="hover:bg-gray-100 transition duration-300"
+                >
+                  <td className="px-6 py-4 text-gray-800 text-sm border-b">
+                    {indexOfFirstItem + index + 1}
+                  </td>
+                  <td className="px-6 py-4 text-gray-800 text-sm border-b">
+                    {category.name}
+                  </td>
+                  <td className="px-6 py-4 text-gray-800 text-sm border-b">
+                    {category.description}
+                  </td>
+                  <td className="px-6 py-4 text-center text-gray-800 text-sm border-b">
+                    <div className="flex items-center justify-center space-x-4">
+                      <button
+                        className="text-blue-600 hover:text-blue-800 focus:outline-none"
+                        onClick={() => handleEdit(category)}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-800 focus:outline-none"
+                        onClick={() => handleDelete(category._id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                  )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  className="px-6 py-4 text-center text-gray-500 text-sm"
+                >
+                  Không có dữ liệu loại thuốc.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
-        {isEditModalOpen && editCategory && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="rounded-lg w-full max-w-lg">
-              <EditMedicineCategory
-                category={editCategory}
-                onSave={handleSave}
-                onClose={() => setIsEditModalOpen(false)}
-              />
-            </div>
-          </div>
-        )}
-
-        {showCreateForm && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="rounded-lg w-full max-w-lg">
-              <AddMedicineCategory
-                onClose={() => setShowCreateForm(false)}
-                onAdd={handleAddCategory}
-              />
-            </div>
+        {/* Phân trang */}
+        {categories.length > itemsPerPage && (
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-100 border-t">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+              disabled={currentPage === 1}
+            >
+              Quay lại
+            </button>
+            <span className="text-gray-600 text-sm">
+              Trang {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              className="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+              disabled={currentPage === totalPages}
+            >
+              Tiếp theo
+            </button>
           </div>
         )}
       </div>
+
+      {/* Create and Edit Modals */}
+      {isEditModalOpen && editCategory && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+            <EditMedicineCategory
+              category={editCategory}
+              onSave={handleSave}
+              onClose={() => setIsEditModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showCreateForm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+            <AddMedicineCategory
+              onClose={() => setShowCreateForm(false)}
+              onAdd={handleAddCategory}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

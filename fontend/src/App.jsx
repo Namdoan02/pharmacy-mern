@@ -21,6 +21,7 @@ import DrugGroup from "./pages/Category.jsx";
 import MedicineDetail from "./components/medicineDetail.jsx";
 import EditMedicineForm from "./pages/updateMedicine.jsx";
 import CustomerTable from "./pages/Customer.jsx";
+import ImportMedicineForm from "./components/importMedicine.jsx";
 
 export default function App() {
   return (
@@ -78,7 +79,7 @@ function MainLayout() {
   const isLoginPage = location.pathname === "/login";
 
   return (
-    <div className="flex h-screen w-full bg-gray-500 text-gray-100 overflow-hidden">
+    <div className="flex h-screen w-full bg-gray-100 text-gray-800 overflow-hidden">
       {!isLoginPage && <Sidebar />}
       <div className={`flex flex-col ${isLoginPage ? "w-full" : "w-full"}`}>
         {!isLoginPage && (
@@ -99,8 +100,9 @@ function MainLayout() {
             <Route path="/supplier/create" element={<AddSupplierForm />} />
             <Route path="/category-medicine" element={<DrugGroup />} />
             <Route path="/medicines/:id" component={<MedicineDetail/>} />
-            <Route path="/medicines/update/:id" element={<EditMedicineForm />} />
+            <Route path="/medicines/update/:id/*" element={<EditMedicineForm />} />
             <Route path="/customers" element={<CustomerTable />} />
+            <Route path="import-medicine" element={<ImportMedicineForm />} />
           </Routes>
         </div>
         <ToastContainer />

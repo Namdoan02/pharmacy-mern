@@ -1,16 +1,13 @@
 import {
   DollarSign,
-  ShoppingBasket,
   ShoppingBag,
   ShoppingCart,
   Users,
-  FolderInput,
   House,
   List,
   Pill,
   HousePlus,
   UserRound,
-  FolderOutput,
   Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -27,7 +24,7 @@ const SIDEBAR_ITEMS = [
   {
     name: "Danh mục thuốc",
     icon: List,
-    color: "#FFFFFF",
+    color: "#007BFF",
     children: [
       {
         name: "Thuốc",
@@ -73,24 +70,6 @@ const SIDEBAR_ITEMS = [
     color: "#33FFFF",
     href: "/orders",
   },
-  {
-    name: "Nhập kho",
-    icon: FolderInput,
-    color: "#6666FF",
-    href: "/warehouse",
-  },
-  {
-    name: "Xuất kho",
-    icon: FolderOutput,
-    color: "#6666FF",
-    href: "/",
-  },
-  {
-    name: "Yêu cầu đặt hàng",
-    icon: ShoppingBasket,
-    color: "#CCCCFF",
-    href: "/",
-  },
 ];
 
 const Sidebar = () => {
@@ -115,25 +94,26 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      <div className="h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-600 overflow-y-auto hide-scrollbar">
-        
+      <div className="h-full bg-white-200 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-300 overflow-y-auto hide-scrollbar">
         {/* Toggle Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={toggleSidebar}
-          className="p-2 rounded-full hover:bg-gray-500 transition-colors max-w-fit"
+          className="p-2 rounded-full hover:bg-blue-300 transition-colors max-w-fit"
         >
           <Menu size={24} />
         </motion.button>
-        
+
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => (
             <div key={item.name}>
               <Link to={item.href} className="block">
                 <motion.div
-                  onClick={() => (item.children ? toggleExpand(item.name) : null)}
-                  className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-500 transition-colors mb-2 cursor-pointer"
+                  onClick={() =>
+                    item.children ? toggleExpand(item.name) : null
+                  }
+                  className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-blue-300 transition-colors mb-2 cursor-pointer"
                 >
                   <item.icon
                     size={20}
@@ -170,7 +150,7 @@ const Sidebar = () => {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.2, delay: 0.3 + index * 0.1 }}
-                        className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-600 transition-colors mb-1"
+                        className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-blue-300 transition-colors mb-1"
                       >
                         <subItem.icon
                           size={18}

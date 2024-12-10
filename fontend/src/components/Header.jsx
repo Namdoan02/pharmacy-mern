@@ -16,7 +16,7 @@ const Header = ({ username, userRole, onLogout }) => {
   };
 
   return (
-    <header className="bg-gray-700 shadow-lg border-b border-gray-600">
+    <header className="bg-blue-500 shadow-lg border-b border-blue-100">
       <div className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Search Input */}
         <form onSubmit={handleSearch} className="flex items-center flex-grow mr-6">
@@ -55,12 +55,19 @@ const Header = ({ username, userRole, onLogout }) => {
               <div className="relative">
                 <span
                   onClick={toggleDropdown}
-                  className="cursor-pointer flex items-center text-white font-semibold"
+                  className="cursor-pointer flex items-center text-black font-semibold"
                 >
                   {username}
                 </span>
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-24 bg-white rounded shadow-lg">
+                  <div className="absolute right-0 mt-2 w-24 bg-white rounded shadow-lg z-50">
+                    <button
+                      // onProfile
+                      onClick={onLogout}
+                      className="w-full px-2 py-1 text-left text-gray-800 hover:bg-red-500 hover:text-white rounded"
+                    >
+                      Hồ sơ
+                    </button>
                     <button
                       onClick={onLogout}
                       className="w-full px-2 py-1 text-left text-gray-800 hover:bg-red-500 hover:text-white rounded"

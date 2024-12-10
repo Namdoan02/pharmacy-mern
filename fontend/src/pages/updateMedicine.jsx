@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
+import ImportMedicineForm from "../components/importMedicine";
 
 const EditMedicineForm = () => {
   const [formData, setFormData] = useState({
@@ -15,24 +16,12 @@ const EditMedicineForm = () => {
     instructions: "",
     description: "",
   });
-
+  const [medicineQuantity, setMedicineQuantity] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [importFormVisible, setImportFormVisible] = useState(false); // State để quản lý hiển thị form nhập thuốc
-  const [importData, setImportData] = useState({
-    quantity: "",
-    purchasePrice: "",
-    retailPrice: "",
-    wholesalePrice: "",
-    batchNumber: "",
-    manufacturingDate: "",
-    expiryDate: "",
-    importDate: "",
-    supplier: "",
-    manufacturingPlace: "",
-  });
+  const [showImportForm, setShowImportForm] = useState(false);
   // Fetch categories when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -77,6 +66,7 @@ const EditMedicineForm = () => {
             instructions: medicine.instructions || "",
             description: medicine.description || "",
           });
+          setMedicineQuantity(medicine.quantity || 0);
         }
       } catch (error) {
         console.error("Error fetching medicine data:", error);
@@ -94,63 +84,6 @@ const EditMedicineForm = () => {
       [name]: value,
     }));
   };
-
-  const handleImportChange = (e) => {
-    const { name, value } = e.target;
-    setImportData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleImportSubmit = async () => {
-    if (!importData.quantity || !importData.purchasePrice || !importData.supplier) {
-      toast.error("Số lượng, giá nhập và nhà cung cấp là bắt buộc!");
-      return;
-    }
-  
-    try {
-      const response = await fetch("http://localhost:5000/api/import-data/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(importData),
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Không thể nhập thuốc.");
-        return;
-      }
-  
-      //const data = await response.json();
-      toast.success("Nhập thuốc thành công!");
-      setImportFormVisible(false); // Ẩn form nhập thuốc sau khi thành công
-      setImportData({ // Reset form nhập dữ liệu
-        quantity: "",
-        purchasePrice: "",
-        retailPrice: "",
-        wholesalePrice: "",
-        batchNumber: "",
-        manufacturingDate: "",
-        expiryDate: "",
-        importDate: "",
-        supplier: "",
-        manufacturingPlace: "",
-      });
-    } catch (error) {
-      console.error("Error submitting import data:", error);
-      toast.error("Đã xảy ra lỗi khi nhập thuốc.");
-    }
-  };
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    setImportData((prevData) => ({
-      ...prevData,
-      importDate: today,  // Set the default value for importDate
-    }));
-  }, []);  
 
   const handleUpdate = async () => {
     if (!formData.name || !formData.category) {
@@ -184,7 +117,6 @@ const EditMedicineForm = () => {
       toast.error("Đã xảy ra lỗi khi cập nhật thuốc.");
     }
   };
-  
 
   return (
     <div className="bg-gray-500 py-8">
@@ -354,6 +286,8 @@ const EditMedicineForm = () => {
               onChange={handleChange}
             />
           </div>
+
+          {/* Số lượng */}
           <div className="space-y-1">
             <label
               htmlFor="quantity"
@@ -366,7 +300,7 @@ const EditMedicineForm = () => {
                 id="quantity"
                 className="border border-gray-300 rounded-lg p-2 w-full text-center bg-gray-100 cursor-not-allowed"
               >
-                0
+               {medicineQuantity}
               </span>
             </div>
           </div>
@@ -407,14 +341,17 @@ const EditMedicineForm = () => {
             />
           </div>
         </div>
+
         {/* Các nút bổ sung */}
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {/* Nút Cập nhật thuốc */}
           <button
             onClick={handleUpdate}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 w-full"
           >
             Cập nhật Thuốc
           </button>
+
           {/* Nút Hủy */}
           <button
             onClick={() => navigate("/medicines")} // Chuyển hướng về trang danh sách thuốc
@@ -424,12 +361,14 @@ const EditMedicineForm = () => {
           </button>
 
           {/* Nút Nhập thuốc */}
-          <button
-            onClick={() => setImportFormVisible(!importFormVisible)} // Chuyển hướng đến trang nhập thuốc
-            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 w-full"
-          >
-            Nhập Thuốc
-          </button>
+          <div className="mt-6 sm:mt-0">
+            <button
+              onClick={() => setShowImportForm(true)}
+              className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 w-full"
+            >
+              Nhập Thuốc
+            </button>
+          </div>
 
           {/* Nút Xem lịch sử nhập thuốc */}
           <button
@@ -439,193 +378,11 @@ const EditMedicineForm = () => {
             Xem Lịch Sử Nhập Thuốc
           </button>
         </div>
-        {importFormVisible && (
-          <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
-              Nhập Thuốc
-            </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-black">
-              {/* Các trường nhập thuốc */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="quantity"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Số lượng
-                </label>
-                <input
-                  type="number"
-                  name="quantity"
-                  id="quantity"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.quantity}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="purchasePrice"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Giá nhập (VND)
-                </label>
-                <input
-                  type="number"
-                  name="purchasePrice"
-                  id="purchasePrice"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.purchasePrice}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="retailPrice"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Giá bán lẻ (VND)
-                </label>
-                <input
-                  type="number"
-                  name="retailPrice"
-                  id="retailPrice"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.retailPrice}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="wholesalePrice"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Giá bán sỉ (VND)
-                </label>
-                <input
-                  type="number"
-                  name="wholesalePrice"
-                  id="wholesalePrice"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.wholesalePrice}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="batchNumber"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Số lô
-                </label>
-                <input
-                  type="text"
-                  name="batchNumber"
-                  id="batchNumber"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.batchNumber}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="manufacturingDate"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Ngày sản xuất
-                </label>
-                <input
-                  type="date"
-                  name="manufacturingDate"
-                  id="manufacturingDate"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.manufacturingDate}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="expiryDate"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Ngày hết hạn
-                </label>
-                <input
-                  type="date"
-                  name="expiryDate"
-                  id="expiryDate"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.expiryDate}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="importDate"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Ngày nhập
-                </label>
-                <input
-                  type="date"
-                  name="importDate"
-                  id="importDate"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.importDate}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="supplier"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Nhà cung cấp
-                </label>
-                <input
-                  type="text"
-                  name="supplier"
-                  id="supplier"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.supplier}
-                  onChange={handleImportChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <label
-                  htmlFor="manufacturingPlace"
-                  className="text-sm font-medium text-gray-600"
-                >
-                  Nơi sản xuất
-                </label>
-                <input
-                  type="text"
-                  name="manufacturingPlace"
-                  id="manufacturingPlace"
-                  className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500"
-                  value={importData.manufacturingPlace}
-                  onChange={handleImportChange}
-                />
-              </div>
-            </div>
-            {/* Các nút bổ sung */}
-            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Nút Hủy */}
-              <button
-                onClick={() => setImportFormVisible(!importFormVisible)} // Chuyển hướng về trang danh sách thuốc
-                className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 "
-              >
-                Hủy
-              </button>
-
-              {/* Nút Nhập thuốc */}
-              <button
-                onClick={handleImportSubmit} // Chuyển hướng đến trang nhập thuốc
-                className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 "
-              >
-                Nhập Thuốc
-              </button>
-            </div>
+        {showImportForm && (
+          <div className="mt-8">
+            <ImportMedicineForm onClose={() => setShowImportForm(false)} medicineId={id}
+              setMedicineQuantity={setMedicineQuantity}/>
           </div>
         )}
       </div>

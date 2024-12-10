@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import AddCustomerForm from "../components/createCustomer";
 import EditCustomer from "../components/updateCustomer";
@@ -137,13 +136,20 @@ function CustomerTable() {
           setCustomers((prevCustomers) =>
             prevCustomers.filter((customer) => customer._id !== customerId)
           );
-          toast.success("Xóa khách hàng thành công");
+          toast.success("Xóa khách hàng thành công", {
+            autoClose: 5000, // Tự động đóng sau 5 giây
+          });
         } else {
-          throw new Error("Failed to delete customer");
+          const errorData = await response.json();
+          toast.error(errorData.message || "Không thể xóa khách hàng.", {
+            autoClose: 5000,
+          });
         }
       } catch (error) {
         console.error("Error deleting customer:", error);
-        toast.error("Đã xảy ra lỗi khi xóa khách hàng");
+        toast.error("Đã xảy ra lỗi khi xóa khách hàng.", {
+          autoClose: 5000,
+        });
       }
     };
 
@@ -154,16 +160,16 @@ function CustomerTable() {
           <div className="flex justify-center space-x-2 mt-2">
             <button
               onClick={() => {
-                deleteCustomer();
-                toast.dismiss(t.id);
+                deleteCustomer(); // Thực hiện xóa
+                toast.dismiss(t.id); // Đóng thông báo xác nhận
               }}
-              className="px-3 py-1 bg-red-500 text-white rounded"
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
             >
               Xác nhận
             </button>
             <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 bg-gray-300 rounded"
+              onClick={() => toast.dismiss(t.id)} // Đóng thông báo xác nhận
+              className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
             >
               Hủy
             </button>
@@ -171,8 +177,10 @@ function CustomerTable() {
         </div>
       ),
       {
-        position: "top-center", // Center the toast
-        duration: 5000,
+        position: "top-center", // Hiển thị ở giữa trên cùng
+        autoClose: false, // Không tự động đóng
+        closeOnClick: false, // Không đóng khi nhấn
+        draggable: false, // Không cho phép kéo toast
         style: {
           background: "#ffffff",
           color: "#333",
@@ -241,6 +249,7 @@ function CustomerTable() {
                           Sửa
                         </div>
                         <div
+                        ref={dropdownRef}
                           onClick={() => handleDelete(customer._id)}
                           className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
                         >
@@ -272,10 +281,13 @@ function CustomerTable() {
         {showCreateForm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="rounded-lg w-full max-w-lg bg-white p-6 shadow-lg">
-              <AddCustomerForm onClose={() => setShowCreateForm(false)} onSave={(newCustomer) => {
-                setCustomers((prev) => [...prev, newCustomer]);
-                setShowCreateForm(false);
-              }} />
+              <AddCustomerForm
+                onClose={() => setShowCreateForm(false)}
+                onSave={(newCustomer) => {
+                  setCustomers((prev) => [...prev, newCustomer]);
+                  setShowCreateForm(false);
+                }}
+              />
             </div>
           </div>
         )}

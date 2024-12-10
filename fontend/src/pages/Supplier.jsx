@@ -236,6 +236,7 @@ function SupplierTable() {
                           Sửa
                         </div>
                         <div
+                          ref={dropdownRef}
                           onClick={() => handleDelete(supplier._id)}
                           className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
                         >
