@@ -59,118 +59,80 @@ const MedicineDetail = ({ medicineItem }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="w-full max-w-4xl mx-auto">
       {/* Thông tin cơ bản */}
-      <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-black">
-        <div className="space-y-1">
+      <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-gray-600">Tên thuốc</label>
-          <input
-            type="text"
-            value={medicine.name || "Không có"}
-            className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-            disabled
-          />
+          <p className="text-sm text-gray-900">{medicine.name || "Không có"}</p>
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600">Loại thuốc</label>
-          <input
-            type="text"
-            value={medicine.category?.name || "Không xác định"}
-            className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-            disabled
-          />
+          <p className="text-sm text-gray-900">{medicine.category?.name || "Không xác định"}</p>       
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600">Liều lượng</label>
-          <input
-            type="text"
-            value={medicine.dosage || "Không xác định"}
-            className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-            disabled
-          />
+          <p className="text-sm text-gray-900">{medicine.dosage || "Không xác định"}</p>       
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-600">Thuốc kê đơn</label>
+          <p className="text-sm text-gray-900">{medicine.prescription || "Không xác định"}</p>       
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600">Đơn vị tính</label>
-          <input
-            type="text"
-            value={medicine.unit || "Không xác định"}
-            className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-            disabled
-          />
+          <p className="text-sm text-gray-900">{medicine.unit || "Không xác định"}</p>       
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-600">Tác dụng phụ</label>
+          <p className="text-sm text-gray-900">{medicine.sideEffects || "Không xác định"}</p>       
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-600">Hướng dẫn sử dụng</label>
+          <p className="text-sm text-gray-900">{medicine.instructions || "Không xác định"}</p>       
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-600">Mô tả</label>
+          <p className="text-sm text-gray-900">{medicine.description || "Không xác định"}</p>       
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600">Số lượng</label>
-          <input
-            type="number"
-            value={medicine.quantity || 0}
-            className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-            disabled
-          />
+          <p className="text-sm text-gray-900">{medicine.quantity || 0}</p>       
         </div>
       </form>
       {latestImport ? (
-        <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-black">
+        <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Giá nhập</label>
-            <input
-              type="text"
-              value={latestImport.purchasePrice || "Không có"}
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+            <label className="text-sm font-medium text-gray-600">Số lô</label>
+            <p className="text-sm text-gray-900">{latestImport.batchNumber || 0}</p>       
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-600">Giá bán lẻ</label>
-            <input
-              type="text"
-              value={latestImport.retailPrice || "Không có"}
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+            <label className="text-sm font-medium text-gray-600">Giá bán sỉ (VNĐ)</label>
+            <p className="text-sm text-gray-900">{latestImport.wholesalePrice || 0}</p>       
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-600">Giá bán lẻ (VNĐ)</label>
+            <p className="text-sm text-gray-900">{latestImport.retailPrice || 0}</p>       
+
           </div>
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-600">Ngày sản xuất</label>
-            <input
-              type="date"
-              value={
-                latestImport.manufacturingDate
+            <p className="text-sm text-gray-900">{latestImport.manufacturingDate
                   ? new Date(latestImport.manufacturingDate).toISOString().split("T")[0]
-                  : ""
-              }
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+                  : ""}</p>       
           </div>
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-600">Ngày hết hạn</label>
-            <input
-              type="date"
-              value={
-                latestImport.expiryDate
+            <p className="text-sm text-gray-900">{latestImport.manufacturingDate
                   ? new Date(latestImport.expiryDate).toISOString().split("T")[0]
-                  : ""
-              }
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+                  : ""}</p>
           </div>
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-600">Nhà cung cấp</label>
-            <input
-              type="text"
-              value={latestImport.supplier || "Không có"}
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+            <p className="text-sm text-gray-900">{latestImport.supplier}</p>       
           </div>
           <div className="space-y-1">
             <label className="text-sm font-medium text-gray-600">Nơi sản xuất</label>
-            <input
-              type="text"
-              value={latestImport.manufacturingPlace || "Không có"}
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 cursor-not-allowed"
-              disabled
-            />
+            <p className="text-sm text-gray-900">{latestImport.manufacturingPlace}</p>       
           </div>
         </form>
       ) : (

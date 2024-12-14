@@ -86,7 +86,7 @@ const AddSupplierForm = ({ onClose }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-700 text-gray-100 rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Thêm Nhà Cung Cấp</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -184,7 +184,7 @@ const AddSupplierForm = ({ onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+            className="px-4 py-2 bg-red-400 text-white rounded-md hover:bg-red-600"
           >
             Đóng
           </button>

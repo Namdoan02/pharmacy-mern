@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Trash2, Edit, Eye } from "lucide-react"; // Import Eye icon để xem chi tiết
+import { Trash2, Edit, Eye, ChevronLeft, ChevronRight } from "lucide-react"; // Import Eye icon để xem chi tiết
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import AddMedicineForm from "../components/createMedicine.jsx";
@@ -276,7 +276,7 @@ const MedicineTable = () => {
             }`}
             disabled={currentPage === 1}
           >
-            Quay lại
+            <ChevronLeft />
           </button>
           <span className="text-gray-700">
             Trang {currentPage} / {totalPages}
@@ -288,7 +288,7 @@ const MedicineTable = () => {
             }`}
             disabled={currentPage === totalPages}
           >
-            Tiếp theo
+            <ChevronRight />
           </button>
         </div>
       )}

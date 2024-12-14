@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import CreateUser from "../components/createUser";
 import EditUser from "../components/updateUser";
 import { Trash2, Edit } from "lucide-react";
@@ -7,11 +7,11 @@ import { toast } from "react-toastify";
 function UserTable() {
   const [users, setUsers] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  // const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const dropdownRef = useRef(null); // Ref to track the dropdown
-  const buttonRef = useRef(null); // Ref to track the button
+  // const dropdownRef = useRef(null); // Ref to track the dropdown
+  // const buttonRef = useRef(null); // Ref to track the button
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -27,23 +27,23 @@ function UserTable() {
     };
 
     fetchUsers();
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    // const handleClickOutside = (event) => {
+    //   if (
+    //     dropdownRef.current &&
+    //     !dropdownRef.current.contains(event.target) &&
+    //     buttonRef.current &&
+    //     !buttonRef.current.contains(event.target)
+    //   ) {
+    //     setActiveDropdown(null);
+    // //   }
+    // };
+    // document.addEventListener("mousedown", handleClickOutside);
+    // return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleDropdown = (index) => {
-    setActiveDropdown(activeDropdown === index ? null : index);
-  };
+  // const toggleDropdown = (index) => {
+  //   setActiveDropdown(activeDropdown === index ? null : index);
+  // };
 
   const handleEdit = (user) => {
     setEditUser(user); // Set the selected user for editing
@@ -162,7 +162,7 @@ function UserTable() {
         </button>
       </div>
 
-      <table className="min-w-full bg-gray-600 rounded-lg shadow-lg">
+      <table className="min-w-full bg-white rounded-lg shadow-lg">
         <thead>
           <tr>
             <th className="px-4 py-2 text-left">STT</th>
@@ -191,34 +191,21 @@ function UserTable() {
               </td>
               <td className="px-4 py-2">{user.email}</td>
               <td className="px-4 py-2">{user.phone}</td>
-              <td className="px-4 py-2 text-center relative">
-                <button
-                  ref={buttonRef}
-                  className="text-gray-400 hover:text-gray-600"
-                  onClick={() => toggleDropdown(index)}
-                >
-                  •••
-                </button>
-                {activeDropdown === index && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
-                    <ul className="py-1 text-gray-700">
-                      <div
-                        ref={dropdownRef}
-                        onClick={() => handleEdit(user._id)}
-                        className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <Edit className="mr-2" />
-                        Sửa
-                      </div>
-                      <div
-                        onClick={() => handleDelete(user._id)}
-                        className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
-                      >
-                        <Trash2 className="mr-2" /> Xoá
-                      </div>
-                    </ul>
-                  </div>
-                )}
+              <td className="px-6 py-4 text-center text-gray-800 text-sm border-b">
+                <div className="flex items-center justify-center space-x-4">
+                  <button
+                    className="text-blue-600 hover:text-blue-800 focus:outline-none"
+                    onClick={() => handleEdit(user._id)}
+                  >
+                    <Edit size={20} />
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-800 focus:outline-none"
+                    onClick={() => handleDelete(user._id)}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

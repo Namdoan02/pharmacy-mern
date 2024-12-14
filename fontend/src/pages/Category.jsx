@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AddMedicineCategory from "../components/createCategory";
 import EditMedicineCategory from "../components/updateCategory";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, ChevronLeft, ChevronRight} from "lucide-react";
 import { toast } from "react-toastify";
 
 const MedicineCategoryTable = () => {
@@ -100,7 +100,7 @@ const MedicineCategoryTable = () => {
             method: "DELETE",
           }
         );
-  
+
         if (response.ok) {
           setCategories((prevCategories) =>
             prevCategories.filter((category) => category._id !== categoryId)
@@ -110,10 +110,9 @@ const MedicineCategoryTable = () => {
           });
         } else {
           const errorData = await response.json();
-          toast.error(
-            errorData.message || "Xóa loại thuốc thất bại.",
-            { duration: 5000 }
-          );
+          toast.error(errorData.message || "Xóa loại thuốc thất bại.", {
+            duration: 5000,
+          });
         }
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -122,7 +121,7 @@ const MedicineCategoryTable = () => {
         });
       }
     };
-  
+
     toast(
       (t) => (
         <div>
@@ -253,7 +252,7 @@ const MedicineCategoryTable = () => {
               className="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50"
               disabled={currentPage === 1}
             >
-              Quay lại
+              <ChevronLeft />
             </button>
             <span className="text-gray-600 text-sm">
               Trang {currentPage} / {totalPages}
@@ -265,7 +264,7 @@ const MedicineCategoryTable = () => {
               className="bg-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-400 disabled:opacity-50"
               disabled={currentPage === totalPages}
             >
-              Tiếp theo
+              <ChevronRight />
             </button>
           </div>
         )}

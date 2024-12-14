@@ -174,7 +174,7 @@ const ImportMedicineForm = ({ onClose, medicineId }) => {
             htmlFor="purchasePrice"
             className="text-sm font-medium text-gray-600"
           >
-            Giá nhập (VND)
+            Giá nhập (VNĐ)
           </label>
           <input
             type="number"
@@ -192,7 +192,7 @@ const ImportMedicineForm = ({ onClose, medicineId }) => {
             htmlFor="retailPrice"
             className="text-sm font-medium text-gray-600"
           >
-            Giá bán lẻ (VND)
+            Giá bán lẻ (VNĐ)
           </label>
           <input
             type="number"
@@ -210,7 +210,7 @@ const ImportMedicineForm = ({ onClose, medicineId }) => {
             htmlFor="wholesalePrice"
             className="text-sm font-medium text-gray-600"
           >
-            Giá bán sỉ (VND)
+            Giá bán sỉ (VNĐ)
           </label>
           <input
             type="number"

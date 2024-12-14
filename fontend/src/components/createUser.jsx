@@ -78,7 +78,7 @@ const CreateUser = ({ onClose }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-700 text-gray-100 rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Thêm người dùng mới</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -113,17 +113,6 @@ const CreateUser = ({ onClose }) => {
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium">Quyền</label>
           <div className="flex items-center space-x-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="role"
-                value="user"
-                checked={role === "user"}
-                onChange={(e) => setRole(e.target.value)}
-                className="mr-2"
-              />
-              Kho
-            </label>
             <label className="flex items-center">
               <input
                 type="radio"
@@ -186,7 +175,7 @@ const CreateUser = ({ onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
             >
               Đóng
             </button>

@@ -96,7 +96,7 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-700 text-gray-100 rounded-lg shadow-lg">
+    <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Cập nhật nhà cung cấp</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -194,7 +194,7 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
           >
             Đóng
           </button>

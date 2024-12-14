@@ -1,77 +1,54 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import AddCustomerForm from "../components/createCustomer";
 import EditCustomer from "../components/updateCustomer";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 
 function CustomerTable() {
   const [customers, setCustomers] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
-  const dropdownRef = useRef(null); // Ref to track the dropdown
-  const buttonRef = useRef(null); // Ref to track the button
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/customers/customers"
-        );
-        const data = await response.json();
-        console.log("Fetched Customers:", data); // Debug the API response
-        setCustomers(data.customers || []); // Fallback to an empty array if data is undefined
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        toast.error("Không thể tải danh sách khách hàng.");
-      }
-    };
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage] = useState(10);
 
-    fetchCustomers();
-
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleDropdown = (index) => {
-    setActiveDropdown(activeDropdown === index ? null : index);
+  const fetchCustomers = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/customers/customers"
+      );
+      const data = await response.json();
+      console.log("Fetched Customers:", data);
+      setCustomers(data.customers || []);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      toast.error("Không thể tải danh sách khách hàng.");
+    }
   };
 
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // Handle Edit Customer
   const handleEdit = (customer) => {
     if (!customer || !customer._id) {
       console.error("Invalid customer data:", customer);
       toast.error("Dữ liệu khách hàng không hợp lệ hoặc thiếu ID!");
       return;
     }
-
-    // Log customer object for debugging
-    console.log("Editing customer:", customer);
-
-    // Set customer for editing
     setEditCustomer(customer);
     setIsEditModalOpen(true);
   };
 
+  // Handle Save Customer
   const handleSave = async (updatedCustomer) => {
     const customerId = updatedCustomer._id || updatedCustomer.data?._id;
 
     if (!customerId) {
-      console.error(
-        "Error: Updated customer does not contain a valid ID.",
-        updatedCustomer
-      );
+      console.error("Error: Updated customer does not contain a valid ID.");
       toast.error("Dữ liệu khách hàng không hợp lệ hoặc thiếu ID!");
       return;
     }
@@ -90,27 +67,7 @@ function CustomerTable() {
 
       if (response.ok) {
         toast.success("Khách hàng đã được cập nhật thành công!");
-
-        const fetchCustomers = async () => {
-          try {
-            const response = await fetch(
-              "http://localhost:5000/api/customers/customers"
-            );
-            if (!response.ok) {
-              throw new Error("Failed to fetch updated customer list");
-            }
-            const data = await response.json();
-            setCustomers(data.customers || []); // Cập nhật danh sách khách hàng vào state
-            console.log("Updated customer list:", data.customers); // Log danh sách để kiểm tra
-          } catch (error) {
-            console.error("Error fetching updated customer list:", error);
-            toast.error("Không thể tải danh sách khách hàng.");
-          }
-        };
-        // Fetch updated customer list
-        await fetchCustomers();
-
-        // Close the modal after successful update
+        fetchCustomers(); // Refetch after update
         setIsEditModalOpen(false);
       } else {
         const errorData = await response.json();
@@ -122,6 +79,7 @@ function CustomerTable() {
     }
   };
 
+  // Handle Delete Customer
   const handleDelete = async (customerId) => {
     const deleteCustomer = async () => {
       try {
@@ -136,20 +94,13 @@ function CustomerTable() {
           setCustomers((prevCustomers) =>
             prevCustomers.filter((customer) => customer._id !== customerId)
           );
-          toast.success("Xóa khách hàng thành công", {
-            autoClose: 5000, // Tự động đóng sau 5 giây
-          });
+          toast.success("Xóa khách hàng thành công");
         } else {
-          const errorData = await response.json();
-          toast.error(errorData.message || "Không thể xóa khách hàng.", {
-            autoClose: 5000,
-          });
+          throw new Error("Failed to delete customer");
         }
       } catch (error) {
         console.error("Error deleting customer:", error);
-        toast.error("Đã xảy ra lỗi khi xóa khách hàng.", {
-          autoClose: 5000,
-        });
+        toast.error("Đã xảy ra lỗi khi xóa khách hàng");
       }
     };
 
@@ -160,15 +111,15 @@ function CustomerTable() {
           <div className="flex justify-center space-x-2 mt-2">
             <button
               onClick={() => {
-                deleteCustomer(); // Thực hiện xóa
-                toast.dismiss(t.id); // Đóng thông báo xác nhận
+                deleteCustomer(); // Perform deletion
+                toast.dismiss(t.id); // Close the confirmation toast
               }}
               className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
             >
               Xác nhận
             </button>
             <button
-              onClick={() => toast.dismiss(t.id)} // Đóng thông báo xác nhận
+              onClick={() => toast.dismiss(t.id)} // Close toast without action
               className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
             >
               Hủy
@@ -177,10 +128,10 @@ function CustomerTable() {
         </div>
       ),
       {
-        position: "top-center", // Hiển thị ở giữa trên cùng
-        autoClose: false, // Không tự động đóng
-        closeOnClick: false, // Không đóng khi nhấn
-        draggable: false, // Không cho phép kéo toast
+        position: "top-center",
+        duration: 5000,
+        closeOnClick: false,
+        draggable: false,
         style: {
           background: "#ffffff",
           color: "#333",
@@ -191,6 +142,16 @@ function CustomerTable() {
       }
     );
   };
+
+  // Pagination Logic
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = customers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="p-6 relative">
@@ -203,9 +164,9 @@ function CustomerTable() {
           Tạo mới
         </button>
       </div>
-      <div className="bg-slate-300 p-3 border rounded-md">
+      <div className="bg-slate-100 p-3 border rounded-md shadow-md">
         <table className="min-w-full bg-white border rounded-lg shadow-lg text-black">
-          <thead>
+          <thead className="bg-gray-200">
             <tr>
               <th className="px-4 py-2 text-left border">STT</th>
               <th className="px-4 py-2 text-left border">Tên khách hàng</th>
@@ -218,9 +179,11 @@ function CustomerTable() {
             </tr>
           </thead>
           <tbody>
-            {customers.map((customer, index) => (
+            {currentCustomers.map((customer, index) => (
               <tr key={customer._id || index} className="border-t">
-                <td className="px-4 py-2 border">{index + 1}</td>
+                <td className="px-4 py-2 border">
+                  {index + 1 + (currentPage - 1) * customersPerPage}
+                </td>
                 <td className="px-4 py-2 border">{customer.name}</td>
                 <td className="px-4 py-2 border">{customer.email}</td>
                 <td className="px-4 py-2 border">{customer.phoneNumber}</td>
@@ -229,42 +192,47 @@ function CustomerTable() {
                   {new Date(customer.birthDate).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2 border">{customer.address}</td>
-                <td className="px-4 py-2 text-center relative">
-                  <button
-                    ref={buttonRef}
-                    className="text-gray-400 hover:text-gray-600"
-                    onClick={() => toggleDropdown(index)}
-                  >
-                    •••
-                  </button>
-                  {activeDropdown === index && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
-                      <ul className="py-1 text-gray-700">
-                        <div
-                          ref={dropdownRef}
-                          onClick={() => handleEdit(customer)}
-                          className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <Edit className="mr-2" />
-                          Sửa
-                        </div>
-                        <div
-                        ref={dropdownRef}
-                          onClick={() => handleDelete(customer._id)}
-                          className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
-                        >
-                          <Trash2 className="mr-2" /> Xoá
-                        </div>
-                      </ul>
-                    </div>
-                  )}
+                <td className="px-6 py-4 text-center text-gray-800 text-sm border-b">
+                  <div className="flex items-center justify-center space-x-4">
+                    <button
+                      className="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      onClick={() => handleEdit(customer)}
+                    >
+                      <Edit size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800 focus:outline-none"
+                      onClick={() => handleDelete(customer._id)}
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* Modal Sửa Khách Hàng */}
+        {/* Pagination Controls */}
+        <div className="mt-4 flex justify-between items-center">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+          >
+            <ChevronLeft />
+          </button>
+          <span className="text-gray-700">Trang {currentPage}</span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage * customersPerPage >= customers.length}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+          >
+            <ChevronRight />
+          </button>
+        </div>
+
+        {/* Modal for Editing Customer */}
         {isEditModalOpen && editCustomer && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="rounded-lg w-full max-w-lg bg-white p-6 shadow-lg">
@@ -277,7 +245,7 @@ function CustomerTable() {
           </div>
         )}
 
-        {/* Modal Thêm Khách Hàng */}
+        {/* Modal for Adding Customer */}
         {showCreateForm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="rounded-lg w-full max-w-lg bg-white p-6 shadow-lg">

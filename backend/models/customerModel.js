@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const customerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phoneNumber: { type: String, required: true, unique: true },
-  gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
+  email: { type: String, required: true, unique: true },
+  gender: { type: String, enum: ['Nam', 'Nữ', 'Khác'], required: true },
   birthDate: { type: Date, required: true },
   address: { type: String, required: true },
 }, { timestamps: true });

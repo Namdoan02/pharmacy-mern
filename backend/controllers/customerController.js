@@ -15,6 +15,7 @@ const createCustomer = async (req, res) => {
     // Tạo khách hàng mới
     const customer = new Customer({
       name,
+      email,
       phoneNumber,
       gender,
       birthDate,
@@ -44,10 +45,11 @@ const getAllCustomers = async (req, res) => {
 const updateCustomer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, phoneNumber, gender, birthDate, address } = req.body;
+    const { name,email, phoneNumber, gender, birthDate, address } = req.body;
 
     const customer = await Customer.findByIdAndUpdate(id, {
       name,
+      email,
       phoneNumber,
       gender,
       birthDate,

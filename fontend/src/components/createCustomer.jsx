@@ -128,9 +128,9 @@ function AddCustomerForm({ onClose, onSave }) {
             onChange={handleChange}
             required
           >
-            <option value="Male">Nam</option>
-            <option value="Female">Nữ</option>
-            <option value="Other">Khác</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
           </select>
         </div>
 
