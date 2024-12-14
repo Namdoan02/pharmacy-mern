@@ -39,7 +39,7 @@ const updateImportData = async (req, res) => {
   try {
     const updatedImportData = await ImportData.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedImportData) {
-      return res.status(404).json({ message: 'Import data not found' });
+      return res.status(404).json({ message: `Import data not found ${updatedImportData}` });
     }
     res.status(200).json({ message: 'Import data updated successfully', data: updatedImportData });
   } catch (error) {

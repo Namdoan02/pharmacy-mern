@@ -220,13 +220,13 @@ const MedicineCategoryTable = () => {
                         className="text-blue-600 hover:text-blue-800 focus:outline-none"
                         onClick={() => handleEdit(category)}
                       >
-                        <Edit size={16} />
+                        <Edit size={20} />
                       </button>
                       <button
                         className="text-red-600 hover:text-red-800 focus:outline-none"
                         onClick={() => handleDelete(category._id)}
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={20} />
                       </button>
                     </div>
                   </td>

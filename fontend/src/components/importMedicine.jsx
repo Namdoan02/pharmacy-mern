@@ -1,10 +1,9 @@
-// components/ImportMedicineForm.js
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-const ImportMedicineForm = ({ onClose, medicineId, setMedicineQuantity }) => {
+const ImportMedicineForm = ({ onClose, medicineId }) => {
   const [importData, setImportData] = useState({
-    quantity: "",
+    quantity: 0,
     purchasePrice: "",
     retailPrice: "",
     wholesalePrice: "",
@@ -38,22 +37,21 @@ const ImportMedicineForm = ({ onClose, medicineId, setMedicineQuantity }) => {
       toast.error("Số lượng, giá nhập và nhà cung cấp là bắt buộc!");
       return;
     }
+
     if (!medicineId) {
       toast.error("Không xác định được ID của thuốc!");
       return;
     }
 
-    // Bao gồm medicineId trong dữ liệu gửi đi
-    importData.medicineId = medicineId; // Bao gồm medicineId
     try {
       const response = await fetch(
-        "http://localhost:5000/api/import-data/create",
+        `http://localhost:5000/api/medicines/import/${medicineId}`, // Endpoint API xử lý nhập thuốc
         {
-          method: "POST",
+          method: "POST", // Đổi sang phương thức POST
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(importData),
+          body: JSON.stringify(importData), // Gửi dữ liệu nhập thuốc
         }
       );
 
@@ -64,24 +62,20 @@ const ImportMedicineForm = ({ onClose, medicineId, setMedicineQuantity }) => {
       }
 
       toast.success("Nhập thuốc thành công!");
-      setMedicineQuantity((prevQuantity) => prevQuantity + parseInt(importData.quantity));
-      // Reset form nhập dữ liệu
       setImportData({
-        quantity: "",
+        quantity: 0,
         purchasePrice: "",
         retailPrice: "",
         wholesalePrice: "",
         batchNumber: "",
         manufacturingDate: "",
         expiryDate: "",
-        importDate: "",
+        importDate: new Date().toISOString().split("T")[0], // Reset ngày nhập về hôm nay
         supplier: "",
         manufacturingPlace: "",
-        medicineId: "",
       });
 
-      // Tự động đóng form nhập thuốc (trở về route gốc của EditMedicineForm)
-      onClose(); // Quay lại route trước đó
+      onClose(); // Đóng form nhập thuốc sau khi thành công
     } catch (error) {
       console.error("Error submitting import data:", error);
       toast.error("Đã xảy ra lỗi khi nhập thuốc.");
@@ -106,14 +100,47 @@ const ImportMedicineForm = ({ onClose, medicineId, setMedicineQuantity }) => {
         }
         const data = await response.json();
         setSuppliers(data.data || []); // Cập nhật danh sách nhà cung cấp vào state
-        console.log("Updated supplier list:", data.data); // Log danh sách để kiểm tra
       } catch (error) {
         console.error("Error fetching updated supplier list:", error);
         toast.error("Không thể tải danh sách nhà cung cấp.");
       }
     };
 
+    // Fetch existing import data for the medicine
+    const fetchImportData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/medicines/import-data/${medicineId}` // API để lấy dữ liệu nhập gần nhất
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch import data");
+        }
+        const data = await response.json();
+        if (data.data) {
+          const importDetails = data.data;
+
+          setImportData((prevData) => ({
+            ...prevData,
+            ...importDetails,
+            importDate: today, // Gán ngày hiện tại nếu không có ngày nhập
+            manufacturingDate: importDetails.manufacturingDate
+              ? new Date(importDetails.manufacturingDate)
+                  .toISOString()
+                  .split("T")[0]
+              : "", // Định dạng ngày sản xuất
+            expiryDate: importDetails.expiryDate
+              ? new Date(importDetails.expiryDate).toISOString().split("T")[0]
+              : "", // Định dạng ngày hết hạn
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching import data:", error);
+        toast.error("Không thể tải dữ liệu nhập thuốc.");
+      }
+    };
+
     fetchSuppliers();
+    fetchImportData(); // Gọi API lấy dữ liệu nhập thuốc
   }, [medicineId]);
 
   return (

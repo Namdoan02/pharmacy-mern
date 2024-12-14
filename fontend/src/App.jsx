@@ -22,6 +22,7 @@ import MedicineDetail from "./components/medicineDetail.jsx";
 import EditMedicineForm from "./pages/updateMedicine.jsx";
 import CustomerTable from "./pages/Customer.jsx";
 import ImportMedicineForm from "./components/importMedicine.jsx";
+import HistoryImportDrug from "./components/historyMedicine.jsx";
 
 export default function App() {
   return (
@@ -103,6 +104,7 @@ function MainLayout() {
             <Route path="/medicines/update/:id/*" element={<EditMedicineForm />} />
             <Route path="/customers" element={<CustomerTable />} />
             <Route path="import-medicine" element={<ImportMedicineForm />} />
+            <Route path="/medicine-history" element={<HistoryImportDrug />} />
           </Routes>
         </div>
         <ToastContainer />

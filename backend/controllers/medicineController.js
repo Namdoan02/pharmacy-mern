@@ -6,8 +6,7 @@ const getAllMedicines = async (req, res) => {
   try {
     const medicines = await Medicine.find()
       .select("name category prescription quantity") // Chỉ lấy các trường cần thiết
-      .populate("category", "name"); // Chỉ lấy tên của loại thuốc
-
+      .populate("category", "name")
     res.status(200).json({
       message: "Danh sách thuốc",
       data: medicines,
@@ -27,7 +26,7 @@ const getMedicineById = async (req, res) => {
       return res.status(400).json({ message: "ID thuốc không hợp lệ" });
     }
 
-    const medicine = await Medicine.findById(id).populate("category");
+    const medicine = await Medicine.findById(id).populate("category")
     if (!medicine) {
       return res.status(404).json({ message: "Không tìm thấy thuốc" });
     }
@@ -107,6 +106,8 @@ const updateMedicine = async (req, res) => {
       sideEffects,
       instructions,
       description,
+      quantity,
+ // Thêm ID của ImportData
     } = req.body;
 
     // Kiểm tra tính hợp lệ của ID
@@ -115,13 +116,13 @@ const updateMedicine = async (req, res) => {
     }
 
     // Tìm thuốc theo ID
-    let medicine = await Medicine.findById(id).populate('category'); // Populate category ở đây
+    let medicine = await Medicine.findById(id).populate("category")
 
     if (!medicine) {
       return res.status(404).json({ message: "Không tìm thấy thuốc" });
     }
 
-    // Cập nhật thông tin thuốc
+    // Cập nhật các trường khác
     medicine.name = name || medicine.name;
     medicine.category = category || medicine.category;
     medicine.dosage = dosage || medicine.dosage;
@@ -132,11 +133,14 @@ const updateMedicine = async (req, res) => {
     medicine.sideEffects = sideEffects || medicine.sideEffects;
     medicine.instructions = instructions || medicine.instructions;
     medicine.description = description || medicine.description;
+    if (quantity !== undefined) {
+      medicine.quantity += parseInt(quantity);
+    }
 
     // Lưu thông tin thuốc đã cập nhật
     const updatedMedicine = await medicine.save();
 
-    // Trả về thông tin thuốc đã cập nhật cùng với thông tin của category
+    // Trả về thông tin thuốc đã cập nhật
     res.status(200).json({
       message: "Cập nhật thuốc thành công",
       data: updatedMedicine,
@@ -146,6 +150,7 @@ const updateMedicine = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi cập nhật thuốc", error });
   }
 };
+
 
 
 // Xóa thuốc
@@ -172,10 +177,117 @@ const deleteMedicine = async (req, res) => {
   }
 };
 
+const importMedicine = async (req, res) => {
+  try {
+    const { id } = req.params; // ID của thuốc
+    const {
+      quantity,
+      purchasePrice,
+      retailPrice,
+      wholesalePrice,
+      batchNumber,
+      manufacturingDate,
+      expiryDate,
+      importDate,
+      supplier,
+      manufacturingPlace,
+    } = req.body;
+
+    // Kiểm tra tính hợp lệ của ID thuốc
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID thuốc không hợp lệ" });
+    }
+
+    // Kiểm tra đầu vào
+    if (
+      !quantity ||
+      !purchasePrice ||
+      !retailPrice ||
+      !wholesalePrice ||
+      !batchNumber ||
+      !manufacturingDate ||
+      !expiryDate ||
+      !importDate ||
+      !supplier ||
+      !manufacturingPlace
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng điền đầy đủ các thông tin nhập thuốc." });
+    }
+
+    // Tìm thuốc theo ID
+    const medicine = await Medicine.findById(id);
+    if (!medicine) {
+      return res.status(404).json({ message: "Không tìm thấy thuốc." });
+    }
+
+    // Cập nhật số lượng thuốc
+    medicine.quantity += quantity;
+
+    // Thêm thông tin nhập khẩu vào mảng importDetails
+    const importData = {
+      quantity,
+      purchasePrice,
+      retailPrice,
+      wholesalePrice,
+      batchNumber,
+      manufacturingDate,
+      expiryDate,
+      importDate,
+      supplier,
+      manufacturingPlace,
+    };
+
+    medicine.importDetails.push(importData);
+
+    // Lưu thông tin thuốc đã cập nhật
+    const updatedMedicine = await medicine.save();
+
+    res.status(200).json({
+      message: "Nhập thuốc thành công",
+      data: updatedMedicine,
+    });
+  } catch (error) {
+    console.error("Error importing medicine:", error);
+    res.status(500).json({ message: "Lỗi khi nhập thuốc", error });
+  }
+};
+
+const getLatestImportData = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID thuốc không hợp lệ" });
+    }
+
+    const medicine = await Medicine.findById(id).select("importDetails");
+
+    if (!medicine || !medicine.importDetails || medicine.importDetails.length === 0) {
+      return res.status(404).json({ message: "Không có dữ liệu nhập thuốc." });
+    }
+
+    // Lấy dữ liệu nhập thuốc gần nhất
+    const latestImport = medicine.importDetails[medicine.importDetails.length - 1];
+
+    res.status(200).json({
+      message: "Dữ liệu nhập thuốc gần nhất",
+      data: latestImport,
+    });
+  } catch (error) {
+    console.error("Error fetching import data:", error);
+    res.status(500).json({ message: "Lỗi khi lấy dữ liệu nhập thuốc", error });
+  }
+};
+
 module.exports = {
   getAllMedicines,
   getMedicineById,
   addMedicine,
   updateMedicine,
   deleteMedicine,
+  importMedicine,
+  getLatestImportData,
+
 };

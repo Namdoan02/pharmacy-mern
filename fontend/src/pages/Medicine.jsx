@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Trash2, Edit, Eye } from "lucide-react"; // Import Eye icon để xem chi tiết
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
@@ -8,18 +8,17 @@ import MedicineDetail from "../components/medicineDetail.jsx";
 const MedicineTable = () => {
   const [medicines, setMedicines] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState(null); // Thông tin thuốc được chọn
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const [medicinesPerPage] = useState(6); // Số lượng thuốc mỗi trang
-  const dropdownRef = useRef(null);
-  const buttonRef = useRef(null);
 
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/medicines/medicines");
+        const response = await fetch(
+          "http://localhost:5000/api/medicines/medicines"
+        );
 
         if (!response.ok) {
           const errorData = await response.text(); // Lấy text nếu không phải JSON
@@ -39,7 +38,14 @@ const MedicineTable = () => {
           category: medicine.category?.name || "Không xác định",
           prescription: medicine.prescription,
           quantity: medicine.quantity || 0,
-          _id: medicine._id, 
+          description: medicine.description,
+          price: medicine.price,
+          manufacturer: medicine.manufacturer,
+          expirationDate: medicine.expirationDate,
+          sideEffects: medicine.sideEffects,
+          dosage: medicine.dosage,
+          storageInstructions: medicine.storageInstructions,
+          _id: medicine._id,
         }));
 
         setMedicines(formattedMedicines);
@@ -50,25 +56,7 @@ const MedicineTable = () => {
     };
 
     fetchMedicines();
-
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const toggleDropdown = (index) => {
-    setActiveDropdown(activeDropdown === index ? null : index);
-  };
 
   const handleAddMedicine = (newMedicine) => {
     setMedicines((prevMedicines) => [...prevMedicines, newMedicine]);
@@ -85,7 +73,7 @@ const MedicineTable = () => {
             method: "DELETE",
           }
         );
-  
+
         if (response.ok) {
           setMedicines((prevMedicines) =>
             prevMedicines.filter((medicine) => medicine._id !== medicineId)
@@ -95,10 +83,9 @@ const MedicineTable = () => {
           });
         } else {
           const errorData = await response.json();
-          toast.error(
-            errorData.message || "Không thể xóa thuốc.",
-            { autoClose: 5000 }
-          );
+          toast.error(errorData.message || "Không thể xóa thuốc.", {
+            autoClose: 5000,
+          });
         }
       } catch (error) {
         console.error("Error deleting medicine:", error);
@@ -107,7 +94,7 @@ const MedicineTable = () => {
         });
       }
     };
-  
+
     toast(
       (t) => (
         <div>
@@ -132,10 +119,10 @@ const MedicineTable = () => {
         </div>
       ),
       {
-        position: "top-center", // Hiển thị ở giữa trên cùng
+        position: "top-center",
         autoClose: false, // Không tự động đóng
-        closeOnClick: false, // Không đóng khi nhấn
-        draggable: false, // Không cho phép kéo toast
+        closeOnClick: false,
+        draggable: false,
         style: {
           background: "#ffffff",
           color: "#333",
@@ -155,7 +142,10 @@ const MedicineTable = () => {
   // Xác định các mục thuốc cần hiển thị dựa trên trang hiện tại
   const indexOfLastMedicine = currentPage * medicinesPerPage;
   const indexOfFirstMedicine = indexOfLastMedicine - medicinesPerPage;
-  const currentMedicines = medicines.slice(indexOfFirstMedicine, indexOfLastMedicine);
+  const currentMedicines = medicines.slice(
+    indexOfFirstMedicine,
+    indexOfLastMedicine
+  );
   const totalPages = Math.ceil(medicines.length / medicinesPerPage);
 
   // Thay đổi trang
@@ -164,7 +154,9 @@ const MedicineTable = () => {
   return (
     <div className="p-6 relative bg-gray-100 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Danh sách thuốc</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Danh sách thuốc
+        </h1>
         <button
           onClick={() => setShowCreateForm(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center"
@@ -176,7 +168,11 @@ const MedicineTable = () => {
             strokeWidth="2"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           Thêm thuốc
         </button>
@@ -227,47 +223,32 @@ const MedicineTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                     {medicine.quantity}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center relative">
-                    <button
-                      ref={buttonRef}
-                      className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                      onClick={() => toggleDropdown(index)}
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-800">
+                    <div className="flex items-center justify-center space-x-4">
+                      {/* Nút Sửa */}
+                      <Link
+                        to={`/medicines/update/${medicine._id}`}
+                        className="text-blue-600 hover:text-blue-800 focus:outline-none flex items-center space-x-1"
                       >
-                        <path d="M6 10a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4zm6 0a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                    {activeDropdown === index && (
-                      <div
-                        ref={dropdownRef}
-                        className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 border"
+                        <Edit size={20} />
+                      </Link>
+
+                      {/* Nút Xóa */}
+                      <button
+                        className="text-red-600 hover:text-red-800 focus:outline-none flex items-center space-x-1"
+                        onClick={() => handleDelete(medicine._id)}
                       >
-                        <ul className="py-1">
-                          <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                            <Edit className="mr-2 text-blue-500" />
-                            <Link to={`/medicines/update/${medicine._id}`} className="text-blue-500">
-                              Sửa
-                            </Link>
-                          </li>
-                          <li
-                            onClick={() => handleDelete(medicine._id)}
-                            className="flex items-center px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer"
-                          >
-                            <Trash2 className="mr-2" /> Xóa
-                          </li>
-                          <li
-                            onClick={() => handleViewDetail(medicine)}
-                            className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                          >
-                            <Eye className="mr-2 text-green-500" /> Xem chi tiết
-                          </li>
-                        </ul>
-                      </div>
-                    )}
+                        <Trash2 size={20} />
+                      </button>
+
+                      {/* Nút Xem Chi tiết */}
+                      <button
+                        className="text-green-600 hover:text-green-800 focus:outline-none flex items-center space-x-1"
+                        onClick={() => handleViewDetail(medicine)}
+                      >
+                        <Eye size={20} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -275,9 +256,9 @@ const MedicineTable = () => {
               <tr>
                 <td
                   colSpan="6"
-                  className="px-6 py-4 text-center text-sm text-gray-500"
+                  className="px-6 py-4 text-center text-sm text-gray-600"
                 >
-                  Không có dữ liệu thuốc.
+                  Không có thuốc nào.
                 </td>
               </tr>
             )}
@@ -320,23 +301,6 @@ const MedicineTable = () => {
               onClick={() => setShowCreateForm(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
             >
-            </button>
-            <AddMedicineForm
-              onAdd={handleAddMedicine}
-              onClose={() => setShowCreateForm(false)}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* View Medicine Detail Modal */}
-      {isDetailModalOpen && selectedMedicine && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
-            <button
-              onClick={() => setIsDetailModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -351,10 +315,47 @@ const MedicineTable = () => {
                 />
               </svg>
             </button>
-            <MedicineDetail
-              medicine={selectedMedicine}
-              onClose={() => setIsDetailModalOpen(false)} // Đóng modal
+            <AddMedicineForm
+              onAdd={handleAddMedicine}
+              onClose={() => setShowCreateForm(false)}
             />
+          </div>
+        </div>
+      )}
+
+      {/* View Medicine Detail Modal */}
+      {isDetailModalOpen && selectedMedicine && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden">
+            <div className="flex justify-between items-center p-6 bg-gray-100">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Chi tiết thuốc
+              </h2>
+              <button
+                onClick={() => setIsDetailModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 max-h-[80vh] overflow-y-auto">
+              <MedicineDetail
+                medicineItem={selectedMedicine}
+                onClose={() => setIsDetailModalOpen(false)}
+              />
+            </div>
           </div>
         </div>
       )}

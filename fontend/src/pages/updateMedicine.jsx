@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// EditMedicineForm.js
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import ImportMedicineForm from "../components/importMedicine";
@@ -15,13 +16,15 @@ const EditMedicineForm = () => {
     sideEffects: "",
     instructions: "",
     description: "",
+    quantity: 0,
   });
-  const [medicineQuantity, setMedicineQuantity] = useState(0);
+
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
   const [showImportForm, setShowImportForm] = useState(false);
+
   // Fetch categories when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -29,13 +32,16 @@ const EditMedicineForm = () => {
         const response = await fetch(
           "http://localhost:5000/api/categories/categories"
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
         const data = await response.json();
         setCategories(data.data); // Assuming response data has a 'data' field for categories
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching categories:", error);
         toast.error("Không thể tải danh sách loại thuốc.");
-        setLoading(false);
+      } finally {
+        setLoadingCategories(false);
       }
     };
 
@@ -43,48 +49,55 @@ const EditMedicineForm = () => {
   }, []);
 
   // Fetch medicine data by ID
-  useEffect(() => {
+  const fetchMedicine = useCallback(async () => {
     if (!id) return;
 
-    const fetchMedicine = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/medicines/medicines/${id}`
-        );
-        const data = await response.json();
-        if (data.data) {
-          const medicine = data.data;
-          setFormData({
-            name: medicine.name || "",
-            category: medicine.category?._id || "",
-            dosage: medicine.dosage || "",
-            usage: medicine.usage || "",
-            unit: medicine.unit || "",
-            prescription: medicine.prescription || "",
-            packaging: medicine.packaging || "",
-            sideEffects: medicine.sideEffects || "",
-            instructions: medicine.instructions || "",
-            description: medicine.description || "",
-          });
-          setMedicineQuantity(medicine.quantity || 0);
-        }
-      } catch (error) {
-        console.error("Error fetching medicine data:", error);
-        toast.error("Không thể lấy thông tin thuốc.");
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/medicines/medicines/${id}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch medicine data");
       }
-    };
-
-    fetchMedicine();
+      const data = await response.json();
+      if (data.data) {
+        const medicine = data.data;
+        setFormData({
+          name: medicine.name || "",
+          category: medicine.category?._id || "",
+          dosage: medicine.dosage || "",
+          usage: medicine.usage || "",
+          unit: medicine.unit || "",
+          prescription: medicine.prescription || "",
+          packaging: medicine.packaging || "",
+          sideEffects: medicine.sideEffects || "",
+          instructions: medicine.instructions || "",
+          description: medicine.description || "",
+          quantity: medicine.quantity || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching medicine data:", error);
+      toast.error("Không thể lấy thông tin thuốc.");
+    }
   }, [id]);
 
+  useEffect(() => {
+    fetchMedicine();
+  }, [fetchMedicine]);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    console.log("update: ", formData);
   };
 
+  // Handle form submission to update medicine
+  // Handle form submission to update medicine
   const handleUpdate = async () => {
     if (!formData.name || !formData.category) {
       toast.error("Tên thuốc và loại thuốc là bắt buộc!");
@@ -92,24 +105,46 @@ const EditMedicineForm = () => {
     }
 
     try {
+      // Lấy thông tin số lượng hiện tại từ backend
       const response = await fetch(
+        `http://localhost:5000/api/medicines/medicines/${id}`
+      );
+      if (!response.ok) {
+        throw new Error("Không thể lấy thông tin thuốc hiện tại.");
+      }
+
+      const data = await response.json();
+      const currentQuantity = data.data.quantity || 0; // Số lượng hiện tại của thuốc
+
+      // Cập nhật số lượng mới (cộng thêm số lượng mới từ formData)
+      const updatedQuantity =
+        parseInt(currentQuantity) + parseInt(formData.quantity);
+
+      // Tạo payload cập nhật
+      const updatedFormData = {
+        ...formData,
+        quantity: updatedQuantity, // Cập nhật số lượng mới
+      };
+
+      // Gửi yêu cầu cập nhật
+      const updateResponse = await fetch(
         `http://localhost:5000/api/medicines/update/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(updatedFormData),
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
         toast.error(errorData.message || "Không thể cập nhật thuốc.");
         return;
       }
 
-      await response.json();
+      await updateResponse.json();
       toast.success("Thuốc đã được cập nhật thành công!");
       navigate("/medicines");
     } catch (error) {
@@ -119,7 +154,7 @@ const EditMedicineForm = () => {
   };
 
   return (
-    <div className="bg-gray-500 py-8">
+    <div className="bg-gray-100 py-8">
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-3xl font-semibold text-center text-blue-600 mb-4">
           Cập nhật thông tin thuốc
@@ -150,7 +185,7 @@ const EditMedicineForm = () => {
             >
               Loại thuốc
             </label>
-            {loading ? (
+            {loadingCategories ? (
               <div className="text-center">
                 Đang tải danh sách loại thuốc...
               </div>
@@ -162,15 +197,12 @@ const EditMedicineForm = () => {
                 value={formData.category}
                 onChange={handleChange}
               >
-                {categories.length > 0 ? (
-                  categories.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Không có loại thuốc</option>
-                )}
+                <option value="">-- Chọn loại thuốc --</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             )}
           </div>
@@ -225,6 +257,7 @@ const EditMedicineForm = () => {
               value={formData.unit}
               onChange={handleChange}
             >
+              <option value="">-- Chọn đơn vị tính --</option>
               <option value="Viên">Viên</option>
               <option value="Vỉ">Vỉ</option>
               <option value="Hộp">Hộp</option>
@@ -246,6 +279,7 @@ const EditMedicineForm = () => {
               value={formData.prescription}
               onChange={handleChange}
             >
+              <option value="">-- Chọn --</option>
               <option value="Có">Có</option>
               <option value="Không">Không</option>
             </select>
@@ -287,7 +321,6 @@ const EditMedicineForm = () => {
             />
           </div>
 
-          {/* Số lượng */}
           <div className="space-y-1">
             <label
               htmlFor="quantity"
@@ -300,7 +333,7 @@ const EditMedicineForm = () => {
                 id="quantity"
                 className="border border-gray-300 rounded-lg p-2 w-full text-center bg-gray-100 cursor-not-allowed"
               >
-               {medicineQuantity}
+                {formData.quantity}
               </span>
             </div>
           </div>
@@ -342,9 +375,9 @@ const EditMedicineForm = () => {
           </div>
         </div>
 
-        {/* Các nút bổ sung */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Nút Cập nhật thuốc */}
+        {/* Action Buttons */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {/* Update Medicine Button */}
           <button
             onClick={handleUpdate}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 w-full"
@@ -352,15 +385,15 @@ const EditMedicineForm = () => {
             Cập nhật Thuốc
           </button>
 
-          {/* Nút Hủy */}
+          {/* Cancel Button */}
           <button
-            onClick={() => navigate("/medicines")} // Chuyển hướng về trang danh sách thuốc
+            onClick={() => navigate("/medicines")} // Navigate back to medicines list
             className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 w-full"
           >
             Hủy
           </button>
 
-          {/* Nút Nhập thuốc */}
+          {/* Import Medicine Button */}
           <div className="mt-6 sm:mt-0">
             <button
               onClick={() => setShowImportForm(true)}
@@ -369,20 +402,15 @@ const EditMedicineForm = () => {
               Nhập Thuốc
             </button>
           </div>
-
-          {/* Nút Xem lịch sử nhập thuốc */}
-          <button
-            onClick={() => navigate("/medicine-history")} // Chuyển hướng đến trang lịch sử nhập thuốc
-            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 w-full"
-          >
-            Xem Lịch Sử Nhập Thuốc
-          </button>
         </div>
 
+        {/* Conditionally Render ImportMedicineForm */}
         {showImportForm && (
           <div className="mt-8">
-            <ImportMedicineForm onClose={() => setShowImportForm(false)} medicineId={id}
-              setMedicineQuantity={setMedicineQuantity}/>
+            <ImportMedicineForm
+              onClose={() => setShowImportForm(false)}
+              medicineId={id}
+            />
           </div>
         )}
       </div>

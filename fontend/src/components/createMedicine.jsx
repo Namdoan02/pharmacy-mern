@@ -112,7 +112,7 @@ const AddMedicineForm = ({ onClose }) => {
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 font-bold"
         >
-          ✕
+          
         </button>
       </div>
       {/* Tên thuốc */}
@@ -177,6 +177,7 @@ const AddMedicineForm = ({ onClose }) => {
             value={formData.unit}
             onChange={handleChange}
           >
+            <option value="">Chọn đơn vị</option>
             <option value="Viên">Viên</option>
             <option value="Vỉ">Vỉ</option>
             <option value="Hộp">Hộp</option>
@@ -195,6 +196,7 @@ const AddMedicineForm = ({ onClose }) => {
             value={formData.prescription}
             onChange={handleChange}
           >
+            <option value="">Thuốc kê đơn</option> 
             <option value="Có">Có</option>
             <option value="Không">Không</option>
           </select>

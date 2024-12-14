@@ -8,6 +8,8 @@ import {
   Pill,
   HousePlus,
   UserRound,
+  PillBottle,
+  History,
   Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -18,56 +20,68 @@ const SIDEBAR_ITEMS = [
   {
     name: "Trang chủ",
     icon: House,
-    color: "#0066FF",
+    color: "#000000",
+    href: "/",
+  },
+  {
+    name: "Bán thuốc",
+    icon: PillBottle,
+    color: "#000000",
     href: "/",
   },
   {
     name: "Danh mục thuốc",
     icon: List,
-    color: "#007BFF",
+    color: "#000000",
     children: [
       {
         name: "Thuốc",
         icon: Pill,
-        color: "#66CCFF",
+        color: "#000000",
         href: "/medicines",
       },
       {
         name: "Loại thuốc",
         icon: ShoppingBag,
-        color: "#33CCFF",
+        color: "#000000",
         href: "/category-medicine",
+      },
+      {
+        name: "Lịch sử nhập thuốc",
+        icon: History,
+        color: "#000000",
+        href: "/medicine-history",
       },
     ],
   },
   {
     name: "Nhà cung cấp",
     icon: HousePlus,
-    color: "#FF3366",
+    color: "#000000",
     href: "/supplier",
   },
   {
     name: "Khách hàng",
     icon: UserRound,
-    color: "#00FF00",
+    color: "#000000",
     href: "/customers",
   },
   {
     name: "Người dùng",
     icon: Users,
-    color: "#FF00CC",
+    color: "#000000",
     href: "/users",
   },
   {
     name: "Báo cáo",
     icon: DollarSign,
-    color: "#FFFF00",
+    color: "#000000",
     href: "/",
   },
   {
     name: "Đơn hàng",
     icon: ShoppingCart,
-    color: "#33FFFF",
+    color: "#000000",
     href: "/orders",
   },
 ];
@@ -94,7 +108,7 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      <div className="h-full bg-white-200 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-300 overflow-y-auto hide-scrollbar">
+      <div className="h-full bg-blue-400 bg-opacity backdrop-blur-md p-4 flex flex-col border-r border-gray-100 overflow-y-auto hide-scrollbar">
         {/* Toggle Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
@@ -113,7 +127,7 @@ const Sidebar = () => {
                   onClick={() =>
                     item.children ? toggleExpand(item.name) : null
                   }
-                  className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-blue-300 transition-colors mb-2 cursor-pointer"
+                  className="flex items-center p-4 text-md font-medium rounded-lg hover:bg-blue-300 transition-colors mb-2 cursor-pointer"
                 >
                   <item.icon
                     size={20}

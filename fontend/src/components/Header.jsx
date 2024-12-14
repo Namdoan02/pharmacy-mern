@@ -16,7 +16,7 @@ const Header = ({ username, userRole, onLogout }) => {
   };
 
   return (
-    <header className="bg-blue-500 shadow-lg border-b border-blue-100">
+    <header className="bg-blue-400 shadow-lg border-b border-blue-100">
       <div className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Search Input */}
         <form onSubmit={handleSearch} className="flex items-center flex-grow mr-6">

@@ -270,8 +270,8 @@ function CustomerTable() {
             <div className="rounded-lg w-full max-w-lg bg-white p-6 shadow-lg">
               <EditCustomer
                 customer={editCustomer}
-                onClose={() => setIsEditModalOpen(false)}
                 onSave={handleSave}
+                onClose={() => setIsEditModalOpen(false)}
               />
             </div>
           </div>
