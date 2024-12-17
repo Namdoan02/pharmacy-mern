@@ -4,26 +4,38 @@ const Customer = require('../models/customerModel');
 // Tạo khách hàng mới
 const createCustomer = async (req, res) => {
   try {
-    const { name, phoneNumber, gender, birthDate, address } = req.body;
-    
+    const { name, phoneNumber } = req.body; // Chỉ yêu cầu name và phoneNumber
+
     // Kiểm tra xem số điện thoại có trùng không
     const existingCustomer = await Customer.findOne({ phoneNumber });
     if (existingCustomer) {
       return res.status(400).json({ message: 'Số điện thoại này đã tồn tại!' });
     }
 
-    // Tạo khách hàng mới
+    // Tạo khách hàng mới chỉ với tên và số điện thoại
     const customer = new Customer({
       name,
-      email,
       phoneNumber,
-      gender,
-      birthDate,
-      address,
+      // Các trường khác không cần thiết ở bước này, có thể để trống hoặc giá trị mặc định
+      email: req.body.email && req.body.email.trim() ? req.body.email : undefined,
+      gender: req.body.gender,
+      birthDate: req.body.birthDate || '',
+      address: req.body.address || '',
     });
 
     await customer.save();
-    return res.status(201).json({ message: 'Khách hàng đã được tạo thành công!', customer });
+    return res.status(201).json({
+      message: 'Khách hàng đã được tạo thành công!',
+      customer: {
+        _id: customer._id,
+        name: customer.name,
+        phoneNumber: customer.phoneNumber,
+        email: customer.email,
+        gender: customer.gender,
+        birthDate: customer.birthDate,
+        address: customer.address,
+      },
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo khách hàng.' });
@@ -85,9 +97,39 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
+// Tìm kiếm khách hàng
+const searchCustomer = async (req, res) => {
+  try {
+    const { name, phoneNumber } = req.query; // Lấy tham số name và phoneNumber từ query string
+
+    // Tạo điều kiện tìm kiếm
+    let searchCondition = {};
+    if (name) {
+      searchCondition.name = { $regex: name, $options: 'i' }; // Tìm kiếm theo tên không phân biệt chữ hoa chữ thường
+    }
+    if (phoneNumber) {
+      searchCondition.phoneNumber = phoneNumber; // Tìm kiếm theo số điện thoại
+    }
+
+    // Tìm khách hàng theo điều kiện
+    const customers = await Customer.find(searchCondition);
+
+    // Kiểm tra xem có khách hàng nào không
+    if (customers.length === 0) {
+      return res.status(404).json({ message: 'Không tìm thấy khách hàng.' });
+    }
+
+    return res.status(200).json({ customers });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi khi tìm kiếm khách hàng.' });
+  }
+};
+
 module.exports = {
   createCustomer,
   getAllCustomers,
   updateCustomer,
   deleteCustomer,
+  searchCustomer,
 };

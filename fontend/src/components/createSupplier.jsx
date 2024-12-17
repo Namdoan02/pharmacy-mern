@@ -6,7 +6,6 @@ const AddSupplierForm = ({ onClose }) => {
   const [supplierName, setSupplierName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [taxCode, setTaxCode] = useState("");
-  const [invoiceSymbol, setInvoiceSymbol] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
@@ -54,7 +53,6 @@ const AddSupplierForm = ({ onClose }) => {
       supplierName,
       contactPerson,
       taxCode,
-      invoiceSymbol,
       email,
       phoneNumber,
       address,
@@ -133,19 +131,6 @@ const AddSupplierForm = ({ onClose }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium">
-              Ký hiệu hóa đơn
-            </label>
-            <input
-              type="text"
-              value={invoiceSymbol}
-              onChange={(e) => setInvoiceSymbol(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
-              placeholder="Nhập ký hiệu hóa đơn"
-              required
-            />
-          </div>
-          <div className="mb-4">
             <label className="block mb-2 text-sm font-medium">Email</label>
             <input
               type="email"
@@ -156,19 +141,19 @@ const AddSupplierForm = ({ onClose }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium">
-              Số điện thoại
-            </label>
-            <input
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
-              placeholder="Nhập số điện thoại"
-              required
-            />
-          </div>
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2 text-sm font-medium">
+            Số điện thoại
+          </label>
+          <input
+            type="text"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
+            placeholder="Nhập số điện thoại"
+            required
+          />
         </div>
         <div className="mb-4">
           <label className="block mb-2 text-sm font-medium">Địa chỉ</label>

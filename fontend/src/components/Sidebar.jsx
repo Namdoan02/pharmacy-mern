@@ -4,91 +4,39 @@ import {
   ShoppingCart,
   Users,
   House,
-  List,
+  ScrollText,
   Pill,
   HousePlus,
   UserRound,
   PillBottle,
-  History,
   Menu,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const SIDEBAR_ITEMS = [
-  {
-    name: "Trang chủ",
-    icon: House,
-    color: "#000000",
-    href: "/",
-  },
-  {
-    name: "Bán thuốc",
-    icon: PillBottle,
-    color: "#000000",
-    href: "/",
-  },
+  { name: "Trang chủ", icon: House, href: "/" },
+  { name: "Bán thuốc", icon: PillBottle, href: "/sell-medicine" },
   {
     name: "Danh mục thuốc",
-    icon: List,
-    color: "#000000",
+    icon: ScrollText,
     children: [
-      {
-        name: "Thuốc",
-        icon: Pill,
-        color: "#000000",
-        href: "/medicines",
-      },
-      {
-        name: "Loại thuốc",
-        icon: ShoppingBag,
-        color: "#000000",
-        href: "/category-medicine",
-      },
-      {
-        name: "Lịch sử nhập thuốc",
-        icon: History,
-        color: "#000000",
-        href: "/medicine-history",
-      },
+      { name: "Thuốc", icon: Pill, href: "/medicines" },
+      { name: "Loại thuốc", icon: ShoppingBag, href: "/category-medicine" },
     ],
   },
-  {
-    name: "Nhà cung cấp",
-    icon: HousePlus,
-    color: "#000000",
-    href: "/supplier",
-  },
-  {
-    name: "Khách hàng",
-    icon: UserRound,
-    color: "#000000",
-    href: "/customers",
-  },
-  {
-    name: "Người dùng",
-    icon: Users,
-    color: "#000000",
-    href: "/users",
-  },
-  {
-    name: "Báo cáo",
-    icon: DollarSign,
-    color: "#000000",
-    href: "/",
-  },
-  {
-    name: "Đơn hàng",
-    icon: ShoppingCart,
-    color: "#000000",
-    href: "/orders",
-  },
+  { name: "Nhà cung cấp", icon: HousePlus, href: "/supplier" },
+  { name: "Khách hàng", icon: UserRound, href: "/customers" },
+  { name: "Nhân viên", icon: Users, href: "/users" },
+  { name: "Báo cáo", icon: DollarSign, href: "/reports" },
+  { name: "Hóa đơn", icon: ShoppingCart, href: "/order" },
 ];
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState({});
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -108,7 +56,7 @@ const Sidebar = () => {
       }`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
-      <div className="h-full bg-blue-400 bg-opacity backdrop-blur-md p-4 flex flex-col border-r border-gray-100 overflow-y-auto hide-scrollbar">
+      <div className="h-full bg-gray-200 bg-opacity-90 p-4 flex flex-col border-r border-gray-300 overflow-y-auto hide-scrollbar">
         {/* Toggle Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
@@ -122,16 +70,23 @@ const Sidebar = () => {
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => (
             <div key={item.name}>
-              <Link to={item.href} className="block">
+              <Link to={item.href || "#"}>
                 <motion.div
                   onClick={() =>
                     item.children ? toggleExpand(item.name) : null
                   }
-                  className="flex items-center p-4 text-md font-medium rounded-lg hover:bg-blue-300 transition-colors mb-2 cursor-pointer"
+                  className={`flex items-center p-4 text-md font-medium rounded-lg mb-2 cursor-pointer transition-all ${
+                    location.pathname === item.href
+                      ? "bg-blue-500 text-white"
+                      : "hover:bg-blue-300 text-gray-800"
+                  }`}
                 >
                   <item.icon
                     size={20}
-                    style={{ color: item.color, minWidth: "20px" }}
+                    style={{ minWidth: "20px" }}
+                    className={
+                      location.pathname === item.href ? "text-white" : ""
+                    }
                   />
                   <AnimatePresence>
                     {isSidebarOpen && (
@@ -149,7 +104,7 @@ const Sidebar = () => {
                 </motion.div>
               </Link>
 
-              {/* Render children with delay if item has children and is expanded */}
+              {/* Render children */}
               {item.children && expandedItems[item.name] && isSidebarOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -158,17 +113,26 @@ const Sidebar = () => {
                   transition={{ duration: 0.2, delay: 0.3 }}
                   className="ml-8"
                 >
-                  {item.children.map((subItem, index) => (
+                  {item.children.map((subItem) => (
                     <Link key={subItem.href} to={subItem.href}>
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: 0.3 + index * 0.1 }}
-                        className="flex items-center p-2 text-sm font-medium rounded-lg hover:bg-blue-300 transition-colors mb-1"
+                        transition={{ duration: 0.2 }}
+                        className={`flex items-center p-2 text-sm font-medium rounded-lg mb-1 transition-all ${
+                          location.pathname === subItem.href
+                            ? "bg-blue-400 text-white"
+                            : "hover:bg-blue-200 text-gray-800"
+                        }`}
                       >
                         <subItem.icon
                           size={18}
-                          style={{ color: subItem.color, minWidth: "18px" }}
+                          style={{ minWidth: "18px" }}
+                          className={
+                            location.pathname === subItem.href
+                              ? "text-white"
+                              : ""
+                          }
                         />
                         <span className="ml-3">{subItem.name}</span>
                       </motion.div>

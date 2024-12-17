@@ -1,118 +1,113 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 
-function HistoryImportDrug() {
-  const [importData, setImportData] = useState([]);
-  const [medicines, setMedicines] = useState([]);
+const HistoryImportDrug = ({ medicineId }) => {
+  const [importHistory, setImportHistory] = useState([]); // Lịch sử nhập kho
+  const [loading, setLoading] = useState(true); // Tình trạng tải dữ liệu
+  const [error, setError] = useState(null); // Xử lý lỗi
+  const hasShownToast = useRef(false); // Flag để kiểm soát toast
 
-  useEffect(() => {
-    // Hàm lấy danh sách thuốc
-    const fetchMedicines = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/medicines/medicines");
-        if (!response.ok) {
-          const errorData = await response.text(); // Lấy text nếu không phải JSON
-          console.error("Error fetching medicines:", errorData);
-          toast.error("Lỗi khi tải danh sách thuốc.");
-          return;
+  // Hàm fetch lịch sử nhập kho dựa trên ID thuốc
+  const fetchImportHistory = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/medicines/import-history/${id}`
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return []; // Trả về mảng rỗng nếu không có lịch sử nhập
         }
-
-        const { data } = await response.json();
-        setMedicines(data || []); // Lưu danh sách thuốc vào state
-      } catch (error) {
-        console.error("Error fetching medicines:", error);
-        toast.error("Lỗi khi tải danh sách thuốc.");
+        throw new Error(`Không thể lấy lịch sử nhập kho, mã lỗi: ${response.status}`);
       }
-    };
 
-    // Hàm lấy dữ liệu nhập thuốc
-    const fetchImportData = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/import-data/import-data");
-        const data = await response.json();
-        console.log("Fetched Import Data:", data); // Debug dữ liệu nhập
-        setImportData(data.importData || []); // Lưu dữ liệu nhập thuốc vào state
-      } catch (error) {
-        console.error("Error fetching import data:", error);
-        toast.error("Không thể tải lịch sử nhập thuốc.");
-      }
-    };
-
-    fetchMedicines();
-    fetchImportData();
-  }, []);
-
-  // Hàm tìm thuốc trong danh sách dựa trên medicineId
-  const findMedicine = (medicineId) => {
-    return medicines.find((medicine) => medicine._id === medicineId);
+      const data = await response.json();
+      return data.data || [];
+    } catch (err) {
+      console.error(err.message);
+      return [];
+    }
   };
 
+  // useEffect để gọi API khi component mount
+  useEffect(() => {
+    const loadImportHistory = async () => {
+      try {
+        setLoading(true);
+        const historyData = await fetchImportHistory(medicineId);
+
+        setImportHistory(historyData);
+
+        // Chỉ hiển thị toast nếu chưa hiển thị và không có dữ liệu
+        if (historyData.length === 0 && !hasShownToast.current) {
+          toast.info("Chưa có lịch sử nhập thuốc.");
+          hasShownToast.current = true; // Đặt cờ đã hiển thị
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (medicineId) {
+      loadImportHistory();
+    } else {
+      toast.error("ID thuốc không hợp lệ.");
+      setError("ID thuốc không hợp lệ.");
+      setLoading(false);
+    }
+  }, [medicineId]);
+
+  // Hiển thị khi đang tải
+  if (loading) {
+    return <p>Đang tải lịch sử nhập kho...</p>;
+  }
+
+  // Hiển thị lỗi nếu có
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
+
+  // Hiển thị khi không có dữ liệu lịch sử
+  if (importHistory.length === 0) {
+    return null;
+  }
+
+  // Hiển thị lịch sử nhập kho
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Lịch sử nhập thuốc</h1>
-      </div>
-      <div className="bg-slate-300 p-3 border rounded-md">
-        <table className="min-w-full bg-white border rounded-lg shadow-lg text-black">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 text-left border">STT</th>
-              <th className="px-4 py-2 text-left border">Tên Thuốc</th>
-              <th className="px-4 py-2 text-left border">Loại Thuốc</th>
-              <th className="px-4 py-2 text-left border">Liều Lượng</th>
-              <th className="px-4 py-2 text-left border">Công Dụng</th>
-              <th className="px-4 py-2 text-left border">Đơn Vị</th>
-              <th className="px-4 py-2 text-left border">Số Lượng Nhập</th>
-              <th className="px-4 py-2 text-left border">Giá Mua</th>
-              <th className="px-4 py-2 text-left border">Giá Bán Lẻ</th>
-              <th className="px-4 py-2 text-left border">Giá Bán Sỉ</th>
-              <th className="px-4 py-2 text-left border">Số Lô</th>
-              <th className="px-4 py-2 text-left border">Ngày Sản Xuất</th>
-              <th className="px-4 py-2 text-left border">Ngày Hết Hạn</th>
-              <th className="px-4 py-2 text-left border">Ngày Nhập</th>
-              <th className="px-4 py-2 text-left border">Nhà Cung Cấp</th>
-              <th className="px-4 py-2 text-left border">Nơi Sản Xuất</th>
-            </tr>
-          </thead>
-          <tbody>
-            {importData.map((importItem, index) => {
-              const medicine = findMedicine(importItem.medicineId); // Tìm thông tin thuốc từ ID
-              return (
-                <tr key={importItem._id || index} className="border-t">
-                  <td className="px-4 py-2 border">{index + 1}</td>
-                  <td className="px-4 py-2 border">
-                    {medicine ? medicine.name : "Không có tên thuốc"}
-                  </td>
-                  <td className="px-4 py-2 border">
-                    {medicine ? medicine.category?.name || "Không xác định" : "Không xác định"}
-                  </td>
-                  <td className="px-4 py-2 border">{medicine?.dosage || "Không có"}</td>
-                  <td className="px-4 py-2 border">{medicine?.usage || "Không có"}</td>
-                  <td className="px-4 py-2 border">{medicine?.unit || "Không có"}</td>
-                  <td className="px-4 py-2 border">{importItem.quantity}</td>
-                  <td className="px-4 py-2 border">{importItem.purchasePrice}</td>
-                  <td className="px-4 py-2 border">{importItem.retailPrice}</td>
-                  <td className="px-4 py-2 border">{importItem.wholesalePrice}</td>
-                  <td className="px-4 py-2 border">{importItem.batchNumber}</td>
-                  <td className="px-4 py-2 border">
-                    {new Date(importItem.manufacturingDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 border">
-                    {new Date(importItem.expiryDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 border">
-                    {new Date(importItem.importDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 border">{importItem.supplier}</td>
-                  <td className="px-4 py-2 border">{importItem.manufacturingPlace}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div className="overflow-x-auto">
+      <h3 className="text-xl font-semibold mb-4">Lịch Sử Nhập Thuốc</h3>
+      {importHistory.map((record, index) => (
+        <div
+          key={index}
+          className="mb-4 p-4 shadow-sm rounded bg-gray-50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <p><strong>Số lô:</strong> {record.batchNumber || "Không có"}</p>
+          <p><strong>Số lượng:</strong> {record.quantity || "Không có"}</p>
+          <p><strong>Giá bán sỉ (VNĐ):</strong> {record.wholesalePrice || "Không có"} đ</p>
+          <p><strong>Giá bán lẻ (VNĐ):</strong> {record.retailPrice || "Không có"} đ</p>
+          <p><strong>Giá nhập (VNĐ):</strong> {record.purchasePrice || "Không có"} đ</p>
+          <p><strong>Ngày nhập:</strong> {record.importDate ? new Date(record.importDate).toLocaleDateString()
+              : "Không có"}</p>
+          <p>
+            <strong>Ngày sản xuất:</strong>{" "}
+            {record.manufacturingDate
+              ? new Date(record.manufacturingDate).toLocaleDateString()
+              : "Không có"}
+          </p>
+          <p>
+            <strong>Ngày hết hạn:</strong>{" "}
+            {record.expiryDate
+              ? new Date(record.expiryDate).toLocaleDateString()
+              : "Không có"}
+          </p>
+          <p><strong>Nhà cung cấp:</strong> {record.supplier || "Không có"}</p>
+          <p><strong>Nơi sản xuất:</strong> {record.manufacturingPlace || "Không có"}</p>
+        </div>
+      ))}
     </div>
   );
-}
+};
 
 export default HistoryImportDrug;

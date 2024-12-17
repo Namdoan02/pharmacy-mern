@@ -280,6 +280,109 @@ const getLatestImportData = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy dữ liệu nhập thuốc", error });
   }
 };
+// Lấy toàn bộ lịch sử nhập kho (importHistory) của một thuốc
+const getImportHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Kiểm tra tính hợp lệ của ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID thuốc không hợp lệ" });
+    }
+
+    // Tìm thuốc theo ID và lấy toàn bộ lịch sử nhập kho
+    const medicine = await Medicine.findById(id).select("importDetails");
+
+    if (!medicine || !medicine.importDetails || medicine.importDetails.length === 0) {
+      return res.status(404).json({ message: "Không có lịch sử nhập kho cho thuốc này." });
+    }
+
+    // Trả về toàn bộ lịch sử nhập kho
+    res.status(200).json({
+      message: "Lịch sử nhập kho của thuốc",
+      data: medicine.importDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching import history:", error);
+    res.status(500).json({ message: "Lỗi khi lấy lịch sử nhập kho", error });
+  }
+};
+// Bán thuốc
+const sellMedicine = async (req, res) => {
+  try {
+    const { id } = req.params; // ID của thuốc
+    const { quantity } = req.body; // Số lượng cần bán
+
+    // Kiểm tra tính hợp lệ của ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID thuốc không hợp lệ" });
+    }
+
+    // Kiểm tra đầu vào
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ message: "Số lượng bán phải lớn hơn 0." });
+    }
+
+    // Tìm thuốc theo ID
+    const medicine = await Medicine.findById(id);
+
+    if (!medicine) {
+      return res.status(404).json({ message: "Không tìm thấy thuốc." });
+    }
+
+    // Kiểm tra số lượng trong kho
+    if (medicine.quantity < quantity) {
+      return res
+        .status(400)
+        .json({ message: "Số lượng trong kho không đủ để bán." });
+    }
+
+    // Giảm số lượng thuốc
+    medicine.quantity -= quantity;
+
+    // Lưu thông tin thuốc đã cập nhật
+    const updatedMedicine = await medicine.save();
+
+    res.status(200).json({
+      message: "Bán thuốc thành công",
+      data: updatedMedicine,
+    });
+  } catch (error) {
+    console.error("Error selling medicine:", error);
+    res.status(500).json({ message: "Lỗi khi bán thuốc", error });
+  }
+};
+// Tìm kiếm thuốc theo tên hoặc công dụng
+const searchMedicine = async (req, res) => {
+  try {
+    const { keyword } = req.query; // Lấy từ khóa tìm kiếm từ query string
+
+    if (!keyword) {
+      return res.status(400).json({ message: "Vui lòng nhập từ khóa tìm kiếm." });
+    }
+
+    // Tìm thuốc theo tên hoặc công dụng (mô tả)
+    const medicines = await Medicine.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } }, // Tìm kiếm không phân biệt hoa thường
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    }).select("name description quantity price unit"); // Chỉ lấy các trường cần thiết
+
+    if (medicines.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy thuốc nào." });
+    }
+
+    res.status(200).json({
+      message: "Kết quả tìm kiếm thuốc",
+      data: medicines,
+    });
+  } catch (error) {
+    console.error("Error searching medicine:", error);
+    res.status(500).json({ message: "Lỗi khi tìm kiếm thuốc", error });
+  }
+};
+
 
 module.exports = {
   getAllMedicines,
@@ -289,5 +392,7 @@ module.exports = {
   deleteMedicine,
   importMedicine,
   getLatestImportData,
-
+  getImportHistory,
+  sellMedicine, // Thêm bán thuốc
+  searchMedicine,
 };

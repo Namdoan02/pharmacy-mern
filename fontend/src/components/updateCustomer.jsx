@@ -70,7 +70,6 @@ function EditCustomer({ customer, onClose, onSave }) {
       }
 
       const data = await response.json();
-      toast.success("Cập nhật khách hàng thành công!");
       onSave(data.customer);
     } catch (error) {
       console.error("Error updating customer:", error);

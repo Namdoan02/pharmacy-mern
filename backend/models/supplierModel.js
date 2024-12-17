@@ -18,11 +18,6 @@ const supplierSchema = new mongoose.Schema(
       unique: true, // Ensure no duplicates
       trim: true,
     },
-    invoiceSymbol: {
-      type: String,
-      required: [true, "Ký hiệu hóa đơn là bắt buộc"],
-      trim: true,
-    },
     email: {
       type: String,
       required: [true, "Email là bắt buộc"], // Validation: required

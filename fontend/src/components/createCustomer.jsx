@@ -117,9 +117,6 @@ function AddCustomerForm({ onClose, onSave }) {
 
         {/* Giới tính */}
         <div className="space-y-1">
-          <label htmlFor="gender" className="text-sm font-medium text-gray-600">
-            Giới Tính
-          </label>
           <select
             name="gender"
             id="gender"
@@ -128,6 +125,7 @@ function AddCustomerForm({ onClose, onSave }) {
             onChange={handleChange}
             required
           >
+            <option value="">Chọn giới tính</option>
             <option value="Nam">Nam</option>
             <option value="Nữ">Nữ</option>
             <option value="Khác">Khác</option>

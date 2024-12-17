@@ -187,7 +187,7 @@ function CustomerTable() {
                 <td className="px-4 py-2 border">{customer.name}</td>
                 <td className="px-4 py-2 border">{customer.email}</td>
                 <td className="px-4 py-2 border">{customer.phoneNumber}</td>
-                <td className="px-4 py-2 border">{customer.gender}</td>
+                <td className="px-4 py-2 border"> {customer.gender === "Male" ? "Nam" : customer.gender === "Female" ? "Nữ" : "Khác"}</td>
                 <td className="px-4 py-2 border">
                   {new Date(customer.birthDate).toLocaleDateString()}
                 </td>

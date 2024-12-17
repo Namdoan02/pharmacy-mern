@@ -15,7 +15,7 @@ const medicineSchema = new mongoose.Schema({
   quantity: { type: Number, default: 0 }, // Số lượng thuốc trong kho
   importDetails: [
     {
-      quantity: { type: Number, required: true }, // Số lượng nhập
+      quantity: { type: Number, required: true,default: 0 }, // Số lượng nhập
       purchasePrice: { type: Number, required: true }, // Giá mua
       retailPrice: { type: Number, required: true }, // Giá bán lẻ
       wholesalePrice: { type: Number, required: true }, // Giá bán sỉ

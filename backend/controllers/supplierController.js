@@ -63,7 +63,6 @@ const updateSupplier = async (req, res) => {
       supplierName,
       contactPerson,
       taxCode,
-      invoiceSymbol,
       email,
       phoneNumber,
       address,
@@ -115,7 +114,6 @@ const updateSupplier = async (req, res) => {
     supplier.supplierName = supplierName || supplier.supplierName;
     supplier.contactPerson = contactPerson || supplier.contactPerson;
     supplier.taxCode = taxCode || supplier.taxCode;
-    supplier.invoiceSymbol = invoiceSymbol || supplier.invoiceSymbol;
     supplier.email = email || supplier.email;
     supplier.phoneNumber = phoneNumber || supplier.phoneNumber;
     supplier.address = address || supplier.address;
@@ -130,7 +128,6 @@ const updateSupplier = async (req, res) => {
         supplierName: updatedSupplier.supplierName,
         contactPerson: updatedSupplier.contactPerson,
         taxCode: updatedSupplier.taxCode,
-        invoiceSymbol: updatedSupplier.invoiceSymbol,
         email: updatedSupplier.email,
         phoneNumber: updatedSupplier.phoneNumber,
         address: updatedSupplier.address,

@@ -10,7 +10,10 @@ const {
   updateMedicine,
   deleteMedicine,
   importMedicine, // Import hàm nhập thuốc
-  getLatestImportData
+  getLatestImportData,
+  getImportHistory,
+  sellMedicine,
+  searchMedicine,
 } = require("../controllers/medicineController");
 
 // Cấu hình CORS
@@ -47,5 +50,7 @@ router.delete("/delete/:id", deleteMedicine); // Xóa thuốc
 router.post("/import/:id", importMedicine); 
 router.get("/import-data/:id", getLatestImportData);
 // Nhập thuốc theo ID
-
+router.get("/import-history/:id", getImportHistory); // Lịch sử nhập thuốc theo ID
+router.put("/reduce-stock/:id", sellMedicine); // Bán thuốc
+router.get("/search", searchMedicine); // Tìm kiếm thuốc
 module.exports = router;

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 import ImportMedicineForm from "../components/importMedicine";
+import HistoryImportDrug from "../components/historyMedicine";
 
 const EditMedicineForm = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,10 @@ const EditMedicineForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showImportForm, setShowImportForm] = useState(false);
-
+  const [showHistory, setShowHistory] = useState(false); // State để hiển thị lịch sử nhập kho
+  const handleToggleHistory = () => {
+    setShowHistory((prev) => !prev); // Đảo ngược trạng thái hiển thị
+  };
   // Fetch categories when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -73,7 +77,7 @@ const EditMedicineForm = () => {
           sideEffects: medicine.sideEffects || "",
           instructions: medicine.instructions || "",
           description: medicine.description || "",
-          quantity: medicine.quantity || "",
+          quantity: medicine.quantity || 0,
         });
       }
     } catch (error) {
@@ -328,7 +332,7 @@ const EditMedicineForm = () => {
             >
               Số lượng
             </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 ">
               <span
                 id="quantity"
                 className="border border-gray-300 rounded-lg p-2 w-full text-center bg-gray-100 cursor-not-allowed"
@@ -376,7 +380,7 @@ const EditMedicineForm = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {/* Update Medicine Button */}
           <button
             onClick={handleUpdate}
@@ -402,6 +406,16 @@ const EditMedicineForm = () => {
               Nhập Thuốc
             </button>
           </div>
+          <div className="mt-6 sm:mt-0">
+          <button
+            onClick={handleToggleHistory} // Toggle state showHistory
+            className={`${
+              showHistory ? "bg-gray-500" : "bg-yellow-500"
+            } text-white px-6 py-2 rounded-lg hover:bg-yellow-600 w-full`}
+          >
+            {showHistory ? "Lịch Sử Nhập Thuốc" : "Lịch Sử Nhập Thuốc"}
+          </button>
+          </div>
         </div>
 
         {/* Conditionally Render ImportMedicineForm */}
@@ -411,6 +425,13 @@ const EditMedicineForm = () => {
               onClose={() => setShowImportForm(false)}
               medicineId={id}
             />
+          </div>
+        )}
+        {/* Component lịch sử nhập kho */}
+        {showHistory && (
+          <div className="mt-8">
+            <HistoryImportDrug 
+            medicineId={id} />
           </div>
         )}
       </div>
