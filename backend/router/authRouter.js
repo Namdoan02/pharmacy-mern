@@ -8,7 +8,7 @@ const {
 } = require("../controllers/authcontroller.js");
 router.use(
   cors({
-    origin: ["http://localhost:5173","https://pharmacy-mern-jqpu.onrender.com"],
+    origin: ["http://localhost:5173","https://pharmacy-mern-kczg.onrender.com"],
     credentials: true,
   })
 );
