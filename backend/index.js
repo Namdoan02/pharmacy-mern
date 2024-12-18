@@ -16,7 +16,6 @@ const PORT = 5000;
 const app = express(); // Initialize app before using it
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
-const __dirname = path.resolve();
 const corsOptions = {
   origin: ["http://localhost:5173","https://pharmacy-mern-jqpu.onrender.com"], // Specific frontend URL
   credentials: true, // Allow cookies and credentials
