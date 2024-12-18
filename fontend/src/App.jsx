@@ -44,7 +44,7 @@ function MainLayout() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
