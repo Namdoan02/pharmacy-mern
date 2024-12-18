@@ -46,7 +46,9 @@ function MainLayout() {
     if (token) {
       fetch(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         credentials: "include",
       })
         .then((response) => {
