@@ -44,7 +44,7 @@ function MainLayout() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      fetch("https://pharmacy-mern-jqpu.onrender.com/api/auth/profile", {
+      fetch(`${import.meta.env.VITE_API_URL}/auth/profile`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
