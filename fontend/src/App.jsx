@@ -25,6 +25,7 @@ import ImportMedicineForm from "./components/importMedicine.jsx";
 import HistoryImportDrug from "./components/historyMedicine.jsx";
 import SellMedicine from "./pages/SellMedicine.jsx";
 import OrderPage from "./pages/Order.jsx";
+import ReportChart from "./pages/Report.jsx";
 
 export default function App() {
   return (
@@ -109,6 +110,7 @@ function MainLayout() {
             <Route path="/medicine-history" element={<HistoryImportDrug />} />
             <Route path="/sell-medicine" element={<SellMedicine/>} />
             <Route path="/order" element={<OrderPage />} />
+            <Route path="/reports" element={<ReportChart />} />
           </Routes>
         </div>
         <ToastContainer />

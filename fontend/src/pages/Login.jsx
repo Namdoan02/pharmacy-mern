@@ -46,47 +46,72 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-900 w-full">
-      {/* Login Form */}
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <form className="space-y-6" onSubmit={handleLogin}>
-          <div>
-            <label className="block text-white mb-2">Tài khoản</label>
-            <input
-              type="email"
-              className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none"
-              placeholder="Email"
-              value={email} // Thêm giá trị cho trường email
-              onChange={(e) => setEmail(e.target.value)} // Cập nhật giá trị khi thay đổi
-            />
-          </div>
-          <div className="relative">
-            <label className="block text-white mb-2">Mật khẩu</label>
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none"
-              placeholder="Mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+    <div className="h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-700">
+      {/* Login Card */}
+      <div className="flex bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-3xl">
+        {/* Left Section - Image */}
+        <div
+          className="hidden md:block md:w-1/2 bg-cover"
+          style={{
+            backgroundImage:
+              "url('https://idodesign.vn/wp-content/uploads/2023/08/mau-thiet-ke-logo-nha-thuoc-dep-1.jpg')",
+          }}
+        ></div>
+
+        {/* Right Section - Form */}
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
+            Chào Mừng Bạn!
+          </h2>
+          <p className="text-center text-gray-500 mb-6">
+            Đăng nhập vào hệ thống để tiếp tục
+          </p>
+
+          <form className="space-y-6" onSubmit={handleLogin}>
+            {/* Email Input */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Tài Khoản
+              </label>
+              <input
+                type="email"
+                className="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"
+                placeholder="Nhập email của bạn"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            {/* Password Input */}
+            <div className="relative">
+              <label className="block text-gray-700 font-medium mb-2">
+                Mật Khẩu
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"
+                placeholder="Nhập mật khẩu của bạn"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute right-3 mt-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
+            </div>
+
+            {/* Login Button */}
             <button
-              type="button"
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-white top-2/3 transform -translate-y-1/2"
-              onClick={() => setShowPassword(!showPassword)}
+              type="submit"
+              className="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-300"
             >
-              {showPassword ? <FiEyeOff /> : <FiEye />}
+              Đăng Nhập
             </button>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-purple-500 text-white p-3 rounded hover:bg-purple-600"
-          >
-            Đăng nhập
-          </button>
-          <div className="text-center text-white mt-4"></div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

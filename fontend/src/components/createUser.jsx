@@ -65,22 +65,22 @@ const CreateUser = ({ onClose }) => {
       });
 
       if (response.ok) {
-        toast.success("Người dùng đã được thêm thành công!");
+        toast.success("Nhân viên đã được thêm thành công!");
         navigate("/users");
         onClose();
       } else {
-        toast.error("Không thể thêm người dùng.");
+        toast.error("Không thể thêm nhân viên.");
       }
     } catch (error) {
       console.error("Error adding user:", error);
-      toast.error("Có lỗi xảy ra khi thêm người dùng.");
+      toast.error("Có lỗi xảy ra khi thêm nhân viên.");
     }
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Thêm người dùng mới</h2>
+        <h2 className="text-2xl font-bold">Thêm nhân viên mới</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           ✕
         </button>
@@ -93,7 +93,7 @@ const CreateUser = ({ onClose }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
-            placeholder="Nhập tên người dùng"
+            placeholder="Nhập tên nhân viên"
             autoComplete="name"
             required
           />

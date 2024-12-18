@@ -12,6 +12,7 @@ const SellMedicine = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPrescription, setShowPrescription] = useState(true);
+  const [selectedType, setSelectedType] = useState("all");
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     phoneNumber: "",
@@ -283,7 +284,8 @@ const SellMedicine = () => {
       )}
 
       {/* Input tìm kiếm thuốc */}
-      <div className="relative mb-4 mt-4">
+      <div className="flex gap-4 items-center mb-4 mt-2">
+      <div className="relative w-full">
         <input
           type="text"
           placeholder="Nhập tên hoặc công dụng của thuốc..."
@@ -296,27 +298,32 @@ const SellMedicine = () => {
           className="absolute top-0 right-0 h-full px-4 text-black rounded-md"
         >
           <Search size={20} />
-        </button>
+        </button></div>
+        <select
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="all">Tất cả</option>
+          <option value="prescription">Thuốc kê đơn</option>
+          <option value="non-prescription">Thuốc không kê đơn</option>
+        </select>
       </div>
+      
 
       {/* Hiển thị kết quả tìm kiếm */}
       {loading && <p>Đang tìm kiếm...</p>}
       {error && <p className="text-red-500">{error}</p>}
       <div>
         {filteredMedicines.map((medicine) => (
-          <div
+          <button
             key={medicine._id}
-            className="flex justify-between items-center p-2 border-b hover:bg-gray-100 cursor-pointer"
+            onClick={() => addToCart(medicine)}
+            className="flex justify-between items-center p-2 border-b w-full hover:bg-gray-300 cursor-pointer rounded-md"
           >
             <span>{medicine.name}</span>
             <span>Số lượng tồn: {medicine.tempQuantity}</span>
-            <button
-              onClick={() => addToCart(medicine)}
-              className="bg-blue-500 text-white px-2 py-1 rounded"
-            >
-              Thêm
-            </button>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -342,7 +349,17 @@ const SellMedicine = () => {
                 <td className="p-2 border">{item.name}</td>
                 <td className="p-2 border">
                   {item.quantity}
-                  <button
+                  
+                </td>
+                <td className="p-2 border">{item.unit}</td>
+                <td className="p-2 border">
+                  {item.price.toLocaleString("vi-VN")} ₫
+                </td>
+                <td className="p-2 border">
+                  {(item.price * item.quantity).toLocaleString("vi-VN")} ₫
+                </td>
+                <td className="p-2 border">
+                <button
                     onClick={() => increaseQuantity(item)}
                     className="bg-blue-500 text-white px-2 py-1 ml-2 rounded"
                   >
@@ -354,18 +371,9 @@ const SellMedicine = () => {
                   >
                     -
                   </button>
-                </td>
-                <td className="p-2 border">{item.unit}</td>
-                <td className="p-2 border">
-                  {item.price.toLocaleString("vi-VN")} ₫
-                </td>
-                <td className="p-2 border">
-                  {(item.price * item.quantity).toLocaleString("vi-VN")} ₫
-                </td>
-                <td className="p-2 border">
                   <button
                     onClick={() => removeFromCart(item)}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-500 text-white px-2 py-1 ml-2 rounded"
                   >
                     Xóa
                   </button>

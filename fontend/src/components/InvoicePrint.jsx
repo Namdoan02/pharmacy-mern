@@ -11,6 +11,7 @@ const InvoicePrint = ({ savedInvoice }) => {
 
     const printContent = `
       <div style="font-family: Arial, sans-serif; margin: 20px;">
+        
         <h2 style="text-align: center;">Hóa Đơn Bán Thuốc</h2>
         <p><strong>Tên khách hàng:</strong> ${savedInvoice.customerName}</p>
         <p><strong>Số điện thoại:</strong> ${savedInvoice.phoneNumber}</p>

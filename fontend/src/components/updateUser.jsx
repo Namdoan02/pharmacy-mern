@@ -69,18 +69,18 @@ const EditUser = ({ userId, onClose, onSave }) => {
         onSave(updatedUser); // Notify parent to refresh the user list
         onClose(); // Close the modal
       } else {
-        toast.error("Không thể cập nhật người dùng.");
+        toast.error("Không thể cập nhật nhân viên.");
       }
     } catch (error) {
       console.error("Error updating user:", error);
-      toast.error("Đã xảy ra lỗi khi cập nhật người dùng.");
+      toast.error("Đã xảy ra lỗi khi cập nhật nhân viên.");
     }
   };
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
     <div className="flex justify-between items-center mb-4">
-      <h2 className="text-2xl font-bold">Cập nhật thông tin</h2>
+      <h2 className="text-2xl font-bold">Cập nhật thông tin nhân viên</h2>
       <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
         ✕
       </button>
@@ -93,7 +93,7 @@ const EditUser = ({ userId, onClose, onSave }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
-          placeholder="Nhập tên người dùng"
+          placeholder="Nhập tên nhân viên"
           autoComplete="name"
           required
         />

@@ -52,5 +52,88 @@ router.get("/import-data/:id", getLatestImportData);
 // Nhập thuốc theo ID
 router.get("/import-history/:id", getImportHistory); // Lịch sử nhập thuốc theo ID
 router.put("/reduce-stock/:id", sellMedicine); // Bán thuốc
-router.get("/search", searchMedicine); // Tìm kiếm thuốc
+router.get("/search", searchMedicine);
+router.get('/report/category', async (req, res) => {
+  try {
+    const report = await Medicine.aggregate([
+      {
+        $group: {
+          _id: '$category', // Gom nhóm theo ID của danh mục
+          totalQuantity: { $sum: '$quantity' }, // Tổng số lượng tồn
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories', // Tên collection chứa thông tin danh mục hoặc tên thuốc
+          localField: '_id',
+          foreignField: '_id',
+          as: 'categoryDetails',
+        },
+      },
+      {
+        $project: {
+          name: { $arrayElemAt: ['$categoryDetails.name', 0] }, // Lấy tên danh mục thay vì ID
+          totalQuantity: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: report });
+  } catch (error) {
+    console.error('Error generating report:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi tạo báo cáo.' });
+  }
+});
+
+// API: Lấy báo cáo kê đơn và không kê đơn
+router.get('/report/prescription', async (req, res) => {
+  try {
+    const report = await Medicine.aggregate([
+      {
+        $project: {
+          name: 1, // Tên thuốc
+          quantity: 1, // Số lượng tồn kho
+          unit: 1, // Đơn vị tính (nếu cần)
+        },
+      },
+      {
+        $sort: { quantity: -1 }, // Sắp xếp giảm dần theo số lượng tồn
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: report });
+  } catch (error) {
+    console.error('Error generating report:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi tạo báo cáo.' });
+  }
+}); // Tìm kiếm thuốc
+router.get('/report/near-expiry', async (req, res) => {
+  const now = new Date();
+  const twoMonthsLater = new Date();
+  twoMonthsLater.setMonth(now.getMonth() + 2);
+  try {
+    const report = await Medicine.aggregate([
+      { $unwind: '$importDetails' },
+      {
+        $match: {
+          'importDetails.expiryDate': { $gte: now, $lte: twoMonthsLater },
+        },
+      },
+    ]);
+    res.status(200).json({ success: true, data: report });
+  } catch (error) {
+    console.error('Error generating near-expiry report:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi tạo báo cáo hết hạn.' });
+  }
+});
+router.get('/report/medicine-names', async (req, res) => {
+  try {
+    // Lấy tất cả _id và name của thuốc
+    const medicines = await Medicine.find({}, '_id name'); 
+    res.status(200).json({ success: true, data: medicines });
+  } catch (error) {
+    console.error('Error fetching medicine names:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi lấy tên thuốc.' });
+  }
+});
 module.exports = router;
