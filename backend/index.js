@@ -40,11 +40,10 @@ app.use("/api/medicines", medicineRouter);
 app.use('/api/customers', customerRouter);
 app.use("/api/invoices", invoiceRoutes);
 
-app.use(express.static(path.join(__dirname, '/client/dist')))
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, "client" , "dist", "index.html"));
-})
+app.use(express.static(path.join(__dirname, "../fontend/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../fontend/dist", "index.html"));
+});
 
 // Start the server
 app.listen(PORT, () => {
