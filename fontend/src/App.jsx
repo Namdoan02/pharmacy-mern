@@ -46,9 +46,8 @@ function MainLayout() {
     if (token) {
       fetch("https://pharmacy-mern-jqpu.onrender.com/api/auth/profile", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       })
         .then((response) => {
           if (!response.ok) {
