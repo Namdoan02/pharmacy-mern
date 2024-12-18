@@ -64,7 +64,7 @@ function UserTable() {
       );
 
       if (response.ok) {
-        toast.success("Người dùng đã được cập nhật thành công!");
+        toast.success("Nhân viên đã được cập nhật thành công!");
 
         // Re-fetch updated user list
         const fetchUsers = async () => {
@@ -87,7 +87,7 @@ function UserTable() {
       }
     } catch (error) {
       console.error("Error updating user:", error);
-      toast.error("Đã xảy ra lỗi khi cập nhật người dùng.");
+      toast.error("Đã xảy ra lỗi khi cập nhật nhân viên.");
     }
   };
 
@@ -104,20 +104,20 @@ function UserTable() {
           setUsers((prevUsers) =>
             prevUsers.filter((user) => user._id !== userId)
           );
-          toast.success("Xóa người dùng thành công");
+          toast.success("Xóa nhân viên thành công");
         } else {
-          toast.error("Không thể xóa người dùng");
+          toast.error("Không thể xóa nhân viên");
         }
       } catch (error) {
-        console.error("Lỗi xóa người dùng:", error);
-        toast.error("Đã xảy ra lỗi khi xóa người dùng");
+        console.error("Lỗi xóa nhân viên:", error);
+        toast.error("Đã xảy ra lỗi khi xóa nhân viên");
       }
     };
 
     toast(
       (t) => (
         <div>
-          <p>Bạn có chắc muốn xóa người dùng này?</p>
+          <p>Bạn có chắc muốn xóa nhân viên này?</p>
           <div className="flex justify-center space-x-2">
             <button
               onClick={() => {
@@ -153,7 +153,7 @@ function UserTable() {
   return (
     <div className="p-6 relative">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Danh sách người dùng</h1>
+        <h1 className="text-2xl font-semibold">Danh sách nhân viên</h1>
         <button
           onClick={() => setShowCreateForm(true)} // Show the modal
           className="bg-blue-600 text-white px-4 py-2 rounded-lg"

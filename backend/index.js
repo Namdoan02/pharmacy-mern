@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
 }).catch((err) => {
   console.log(err);
 });
- 
+
 
 app.use("/api/auth/", authRouter);
 app.use("/api/users", userRouter);
@@ -38,6 +38,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/medicines", medicineRouter);
 app.use('/api/customers', customerRouter);
 app.use("/api/invoices", invoiceRoutes);
+
 
 // Start the server
 app.listen(PORT, () => {
