@@ -44,7 +44,7 @@ function MainLayout() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      fetch("http://localhost:5000/api/auth/profile", {
+      fetch("https://pharmacy-mern-jqpu.onrender.com/api/auth/profile", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

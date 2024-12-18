@@ -52,7 +52,9 @@ const loginUser = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
+  const token =
+    req.cookies?.authorization || // Lấy token từ cookie
+    req.headers["authorization"]?.split(" ")[1]; // Lấy token từ header
 
   if (!token) {
     return res.status(401).json({ success: false, message: "No token provided" });
@@ -70,12 +72,16 @@ const getProfile = async (req, res) => {
     res.json({ success: true, profile: user, isAdmin });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
+      return res.status(401).json({
+        success: false,
+        message: "Session expired. Please log in again.",
+      });
     }
 
     res.status(403).json({ success: false, message: error.message || "An error occurred" });
   }
 };
+
 
 module.exports = {
   auth,
