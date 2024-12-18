@@ -9,7 +9,6 @@ const customerRouter = require('./router/customerRouter.js');
 const invoiceRoutes = require("./router/invoiceRoutes.js");
 const path = require('path');
 
-
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
 const PORT = 5000;
