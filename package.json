@@ -6,13 +6,13 @@
   "scripts": {
     "start": "npm run start:backend",
     "start:backend": "npm start --prefix backend",
-    "start:frontend": "npm start --prefix fontend",
+    "start:fontend": "npm start --prefix fontend",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:fontend\"",
     "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npm start --prefix fontend",
+    "dev:fontend": "npm start --prefix fontend",
     "build": "npm run build:backend && npm run build:fontend",
     "build:backend": "npm install --prefix backend",
-    "build:frontend": "npm install --prefix fontend && npm run build --prefix fontend"
+    "build:fontend": "npm install --prefix fontend && npm run build --prefix fontend"
   },
   "keywords": [],
   "author": "",
