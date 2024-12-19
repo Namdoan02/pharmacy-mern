@@ -44,7 +44,7 @@ function MainLayout() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
+      fetch(`http://localhost:5000/api/auth/profile`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
