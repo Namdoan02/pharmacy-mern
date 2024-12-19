@@ -28,7 +28,17 @@ const Login = () => {
         credentials: "include",
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        // Kiểm tra xem phản hồi có phải JSON không
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Response is not valid JSON:", jsonError);
+        toast.error("Server không trả về dữ liệu hợp lệ");
+        return;
+      }
+
+      // const data = await response.json();
 
       if (response.ok) {
         toast.success("Đăng nhập thành công!");
