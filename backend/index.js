@@ -16,7 +16,7 @@ const app = express(); // Initialize app before using it
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 const corsOptions = {
-  origin: ["http://localhost:5173"], // Specific frontend URL
+  origin: ["http://localhost:5173","https://pharmacy-mern-kczg.onrender.com"], // Specific frontend URL
   credentials: true, // Allow cookies and credentials
 };
 // Middleware
