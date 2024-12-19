@@ -11,7 +11,7 @@ const path = require('path');
 
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 const app = express(); // Initialize app before using it
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -45,6 +45,6 @@ app.get("*", (req, res) => {
 });
 
 // Start the server
-app.listen(PORT,"0.0.0.0",() => {
-  console.log(`Server is running on port http://0.0.0.0:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
 });
