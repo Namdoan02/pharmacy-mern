@@ -78,7 +78,7 @@ const CreateUser = ({ onClose }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-200 text-gray-900 rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white text-gray-900 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Thêm nhân viên mới</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">

@@ -156,11 +156,27 @@ const deleteSupplier = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi xóa nhà cung cấp", error });
   }
 };
+const searchSuppliers = async (req, res) => {
+  try {
+    const { search } = req.query;
 
+    const suppliers = await Supplier.find({
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { contactPerson: { $regex: search, $options: "i" } },
+      ],
+    });
+
+    res.status(200).json(suppliers);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi tìm kiếm nhà cung cấp", error });
+  }
+};
 module.exports = {
   getAllSuppliers,
   getSupplierById,
   addSupplier,
   updateSupplier,
   deleteSupplier,
+  searchSuppliers,
 };

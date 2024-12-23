@@ -96,10 +96,23 @@ const deleteCategory = async (req, res) => {
     res.status(500).json({ message: "Failed to delete category", error: error.message });
   }
 };
+const searchCategories = async (req, res) => {
+  try {
+    const { search } = req.query;
 
+    const categories = await Category.find({
+      name: { $regex: search, $options: "i" },
+    });
+
+    res.status(200).json(categories);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi tìm kiếm danh mục thuốc", error });
+  }
+};
 module.exports = {
   createCategory,
   getAllCategories,
   updateCategory,
   deleteCategory,
+  searchCategories,
 };

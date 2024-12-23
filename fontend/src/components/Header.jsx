@@ -1,16 +1,47 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 
 const Header = ({ username, userRole, onLogout }) => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const handleSearch = (e) => {
+  const location = useLocation(); // Lấy đường dẫn hiện tại
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearch = async (e) => {
     e.preventDefault();
-    // Implement search functionality if needed
+  
+    let apiUrl = "";
+  
+    // Xác định URL API theo từng mục
+    switch (location.pathname) {
+      case "/medicines":
+        apiUrl = `http://localhost:5000/api/medicines/search?keyword=${searchQuery}`;
+        break;
+      case "/customers":
+        apiUrl = `http://localhost:5000/api/customers/search?keyword=${searchQuery}`;
+        break;
+      case "/category-medicine":
+        apiUrl = `http://localhost:5000/api/categories/search?keyword=${searchQuery}`;
+        break;
+      default:
+        console.log("Không tìm thấy mục tương ứng");
+        return;
+    }
+  
+    try {
+      const response = await fetch(apiUrl); // Gọi API
+      if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu");
+  
+      const data = await response.json(); // Chuyển dữ liệu API về JSON
+      setSearchResults(data); // Lưu dữ liệu vào state
+    } catch (error) {
+      console.error("Lỗi tìm kiếm:", error);
+    }
   };
-
+  
+  const handleProfileClick = () => {
+    navigate("/profile"); // Điều hướng đến component hồ sơ
+  };
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -43,7 +74,7 @@ const Header = ({ username, userRole, onLogout }) => {
         <div className="ml-auto flex items-center space-x-4 text-white font-medium">
           {username && userRole ? (
             <>
-             <div
+              <div
                 className={`px-4 py-2 rounded-full text-white font-semibold ${
                   userRole === "admin" ? "bg-red-500" : "bg-blue-500"
                 }`}
@@ -51,7 +82,7 @@ const Header = ({ username, userRole, onLogout }) => {
                 {userRole}
               </div>
 
-              {/* Dropdown for Logout */}
+              {/* Dropdown for Profile and Logout */}
               <div className="relative">
                 <span
                   onClick={toggleDropdown}
@@ -62,9 +93,8 @@ const Header = ({ username, userRole, onLogout }) => {
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-24 bg-white rounded shadow-lg z-50">
                     <button
-                      // onProfile
-                      onClick={onLogout}
-                      className="w-full px-2 py-1 text-left text-gray-800 hover:bg-red-500 hover:text-white rounded"
+                      onClick={handleProfileClick}
+                      className="w-full px-2 py-1 text-left text-gray-800 hover:bg-blue-500 hover:text-white rounded"
                     >
                       Hồ sơ
                     </button>
@@ -88,6 +118,19 @@ const Header = ({ username, userRole, onLogout }) => {
           )}
         </div>
       </div>
+      <div className="bg-white p-4 rounded shadow mt-4 max-w-7xl mx-auto">
+      {searchResults.length > 0 ? (
+        <ul>
+          {searchResults.map((item, index) => (
+            <li key={index} className="border-b py-2">
+              {item.name || item.title || item.customerName} {/* Hiển thị thông tin theo mục */}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500">Không tìm thấy dữ liệu</p>
+      )}
+    </div>
     </header>
   );
 };

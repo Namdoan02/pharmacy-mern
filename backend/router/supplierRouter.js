@@ -8,6 +8,7 @@ const {
   addSupplier,
   updateSupplier,
   deleteSupplier,
+  searchSuppliers,
 } = require("../controllers/supplierController.js");
 
 // CORS Configuration
@@ -38,5 +39,5 @@ router.get("/suppliers", getAllSuppliers); // Get all suppliers
 router.get("/suppliers/:id", getSupplierById); // Get a supplier by ID
 router.put("/update/:id", updateSupplier); // Update a supplier by ID
 router.delete("/delete/:id", deleteSupplier); // Delete a supplier by ID
-
+router.get("/search", searchSuppliers); // Search suppliers
 module.exports = router;

@@ -4,6 +4,7 @@ import "./index.css";
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserContextProvider, UserContext } from "../context/usercontext.jsx";
+import Profile from "./components/Profile.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
 import MedicineTable from "./pages/Medicine.jsx";
@@ -94,6 +95,7 @@ function MainLayout() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile username={user?.name} userRole={user?.role} />} />
             <Route path="/medicines" element={<MedicineTable />} />
             <Route path="/register" element={<Register />} />
             <Route path="/users" element={<Users />} />

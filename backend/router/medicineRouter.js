@@ -14,6 +14,8 @@ const {
   getImportHistory,
   sellMedicine,
   searchMedicine,
+  getReportByDate,
+  getReportByCategory,
 } = require("../controllers/medicineController");
 
 // Cấu hình CORS
@@ -45,7 +47,7 @@ router.get("/medicines/:id", getMedicineById); // Lấy thông tin thuốc theo 
 router.post("/create", addMedicine); // Thêm thuốc mới
 router.put("/update/:id", updateMedicine); // Cập nhật thông tin thuốc
 router.delete("/delete/:id", deleteMedicine); // Xóa thuốc
-
+router.get("/report/category", getReportByCategory);
 // Route nhập thuốc
 router.post("/import/:id", importMedicine); 
 router.get("/import-data/:id", getLatestImportData);
@@ -136,4 +138,6 @@ router.get('/report/medicine-names', async (req, res) => {
     res.status(500).json({ success: false, message: 'Lỗi khi lấy tên thuốc.' });
   }
 });
+router.get("/report/by-date", getReportByDate);
+
 module.exports = router;

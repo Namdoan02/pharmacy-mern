@@ -1,23 +1,27 @@
 import { useContext } from "react";
-import { UserContext } from "../../context/usercontext";
+import { UserContext } from "../../context/usercontext"; // Đảm bảo bạn đang nhập đúng UserContext
 
 const InvoicePrint = ({ savedInvoice }) => {
-  const { user, loading } = useContext(UserContext); // Consume the context
+  const { user, loading } = useContext(UserContext); // Lấy dữ liệu từ UserContext
 
   const printInvoice = () => {
-    if (!savedInvoice || loading) return;
+    if (!savedInvoice || loading || !user) {
+      console.log("Dữ liệu chưa sẵn sàng để in");
+      return;
+    }
 
+    console.log("Tên nhân viên từ context:", user.name);
     const formattedDate = new Date(savedInvoice.createdAt).toLocaleString();
 
     const printContent = `
-      <div style="font-family: Arial, sans-serif; margin: 20px;">
-        
-        <h2 style="text-align: center;">Hóa Đơn Bán Thuốc</h2>
+      <div style="font-family: Arial, sans-serif; margin: 20px; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <img src="logo.png" alt="Logo" style="height: 80px;">
+          <h2 style="text-align: center; flex-grow: 1;">Hóa Đơn Bán Thuốc</h2>
+        </div>
         <p><strong>Tên khách hàng:</strong> ${savedInvoice.customerName}</p>
         <p><strong>Số điện thoại:</strong> ${savedInvoice.phoneNumber}</p>
-        <p><strong>Nhân viên lập hóa đơn:</strong> ${
-          user?.username || "Không xác định"
-        }</p>
+        <p><strong>Nhân viên lập hóa đơn:</strong> ${user?.name || "Không xác định"}</p>
         <p><strong>Ngày giờ tạo hóa đơn:</strong> ${formattedDate}</p>
         <table border="1" cellspacing="0" cellpadding="5" style="width: 100%; text-align: center; margin-top: 20px;">
           <thead>
@@ -67,7 +71,7 @@ const InvoicePrint = ({ savedInvoice }) => {
     iframeDoc.write(`
       <html>
         <head>
-          <title></title>
+          <title>In hóa đơn</title>
         </head>
         <body>${printContent}</body>
       </html>

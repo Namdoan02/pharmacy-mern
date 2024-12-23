@@ -10,19 +10,31 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const ReportChart = () => {
   const [chartData, setChartData] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState("category");
+  const [selectedStartDate, setSelectedStartDate] = useState("");
+  const [selectedEndDate, setSelectedEndDate] = useState("");
   const [medicineNames, setMedicineNames] = useState({});
   const [isNamesLoaded, setIsNamesLoaded] = useState(false);
+  const [listData, setListData] = useState([]);
 
   // Hàm lấy danh sách ID và tên thuốc từ API
   const fetchMedicineNames = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/medicines/medicines");
+      const response = await fetch(
+        "http://localhost:5000/api/medicines/medicines"
+      );
       const result = await response.json();
 
       if (response.ok) {
@@ -38,11 +50,11 @@ const ReportChart = () => {
     } catch (error) {
       console.error("Error fetching medicine names:", error);
     }
-  }, [medicineNames]);
+  }, []);
 
   // Hàm lấy dữ liệu báo cáo từ API
   const fetchReportData = useCallback(
-    async (reportType) => {
+    async (reportType, startDate = "", endDate = "") => {
       setLoading(true);
       let url = "";
 
@@ -52,37 +64,60 @@ const ReportChart = () => {
         url = "http://localhost:5000/api/medicines/report/prescription";
       else if (reportType === "near-expiry")
         url = "http://localhost:5000/api/medicines/report/near-expiry";
+      else if (reportType === "by-date" && startDate && endDate)
+        url = `http://localhost:5000/api/medicines/report/by-date?startDate=${startDate}&endDate=${endDate}`;
 
       try {
         const response = await fetch(url);
         const result = await response.json();
-    
+
         if (response.ok) {
-          const labels = result.data.map((item) => item.name); // Lấy tên thuốc
-          const quantities = result.data.map((item) => item.quantity); // Lấy số lượng tồn
-    
-          setChartData({
-            labels,
-            datasets: [
-              {
-                label: "Số lượng tồn",
-                data: quantities,
-                backgroundColor: labels.map(
-                  () =>
-                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
-                      Math.random() * 255
-                    )}, ${Math.floor(Math.random() * 255)}, 0.6)`
-                ), // Màu sắc ngẫu nhiên
-                borderColor: labels.map(
-                  () =>
-                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
-                      Math.random() * 255
-                    )}, ${Math.floor(Math.random() * 255)}, 1)`
-                ), // Viền đậm hơn
-                borderWidth: 1,
+          if (reportType === "by-date") {
+            setListData(result.data);
+          } else {
+            const labels = result.data.map((item) => item.name);
+            const quantities = result.data.map((item) => item.quantity);
+            const expiryDates = result.data.map((item) => item.expiryDate); // Add expiry dates
+
+            setChartData({
+              labels,
+              datasets: [
+                {
+                  label: "Số lượng tồn",
+                  data: quantities,
+                  backgroundColor: labels.map(
+                    () =>
+                      `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                        Math.random() * 255
+                      )}, ${Math.floor(Math.random() * 255)}, 0.6)`
+                  ),
+                  borderColor: labels.map(
+                    () =>
+                      `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                        Math.random() * 255
+                      )}, ${Math.floor(Math.random() * 255)}, 1)`
+                  ),
+                  borderWidth: 1,
+                },
+              ],
+            });
+            // Customize tooltip
+            setChartData((prevData) => ({
+              ...prevData,
+              options: {
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const index = context.dataIndex;
+                        return `${labels[index]}: ${quantities[index]} (HSD: ${expiryDates[index]})`;
+                      },
+                    },
+                  },
+                },
               },
-            ],
-          });
+            }));
+          }
         }
       } catch (error) {
         console.error("Error fetching report data:", error);
@@ -94,14 +129,28 @@ const ReportChart = () => {
   );
 
   useEffect(() => {
-    fetchMedicineNames();
-  }, [fetchMedicineNames]);
+    fetchMedicineNames(medicineNames);
+  }, []);
 
   useEffect(() => {
     if (isNamesLoaded) {
-      fetchReportData(selectedReport);
+      if (
+        selectedReport === "by-date" &&
+        selectedStartDate &&
+        selectedEndDate
+      ) {
+        fetchReportData(selectedReport, selectedStartDate, selectedEndDate);
+      } else {
+        fetchReportData(selectedReport);
+      }
     }
-  }, [selectedReport, isNamesLoaded, fetchReportData]);
+  }, [
+    selectedReport,
+    selectedStartDate,
+    selectedEndDate,
+    isNamesLoaded,
+    fetchReportData,
+  ]);
 
   return (
     <div className="container mx-auto p-6">
@@ -115,14 +164,75 @@ const ReportChart = () => {
           className="p-2 border rounded"
         >
           <option value="category">Thống kê theo danh mục</option>
-          <option value="prescription">Thống kê kê số lượng tồn</option>
+          <option value="prescription">Thống kê số lượng tồn</option>
           <option value="near-expiry">Thống kê thuốc sắp hết hạn</option>
+          <option value="by-date">Thống kê theo ngày</option>
         </select>
       </div>
 
-      {/* Biểu đồ */}
+      {/* Input chọn ngày nếu loại báo cáo là by-date */}
+      {selectedReport === "by-date" && (
+        <div className="flex justify-center mb-4 space-x-4">
+          <input
+            type="date"
+            value={selectedStartDate}
+            onChange={(e) => setSelectedStartDate(e.target.value)}
+            className="p-2 border rounded"
+          />
+          <input
+            type="date"
+            value={selectedEndDate}
+            onChange={(e) => setSelectedEndDate(e.target.value)}
+            className="p-2 border rounded"
+          />
+        </div>
+      )}
+
+      {/* Biểu đồ hoặc danh sách */}
       {loading ? (
         <p className="text-center">Đang tải dữ liệu...</p>
+      ) : selectedReport === "by-date" ? (
+        <div className="text-center">
+          <h3 className="text-xl font-bold mb-4 text-blue-600">
+            Danh sách số lượng tồn
+          </h3>
+          {listData.length > 0 ? (
+            <div className="overflow-x-auto ">
+              <table className="table-auto w-full border-collapse border border-gray-300">
+                <thead className="bg-gray-100 ">
+                  <tr>
+                    <th className="border border-gray-300 px-4 py-2 text-center text-gray-700">
+                      Tên thuốc
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2 text-center text-gray-700">
+                      Số lượng tồn
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2 text-center text-gray-700">
+                      Số lượng đã bán
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listData.map((item, index) => (
+                    <tr key={index} className="odd:bg-white even:bg-gray-50">
+                      <td className="border border-gray-300 px-4 py-2 text-gray-800 text-left">
+                        {item.name}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-gray-800">
+                        {item.stockQuantity}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-gray-800">
+                        {item.soldQuantity}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-red-500">Không có dữ liệu để hiển thị.</p>
+          )}
+        </div>
       ) : chartData && chartData.labels ? (
         <Bar
           data={chartData}
@@ -135,7 +245,9 @@ const ReportChart = () => {
           }}
         />
       ) : (
-        <p className="text-center text-red-500">Không có dữ liệu để hiển thị.</p>
+        <p className="text-center text-red-500">
+          Không có dữ liệu để hiển thị.
+        </p>
       )}
     </div>
   );

@@ -1,4 +1,7 @@
-const Medicine = require("../models/medicineModel"); // Adjust the path as needed
+const Medicine = require("../models/medicineModel");
+const Invoice  = require("../models/invoiceModel")
+const Category = require("../models/categoryModel"); // Nếu có model Category riêng
+ // Adjust the path as needed
 const mongoose = require("mongoose");
 
 // Lấy danh sách tất cả thuốc
@@ -383,6 +386,74 @@ const searchMedicine = async (req, res) => {
   }
 };
 
+const getReportByDate = async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ message: "Vui lòng cung cấp ngày bắt đầu và ngày kết thúc." });
+  }
+
+  try {
+    // Lấy danh sách thuốc từ bảng Medicine
+    const medicines = await Medicine.find();
+
+    // Lấy hóa đơn từ bảng Invoice trong khoảng ngày
+    const invoices = await Invoice.find({
+      createdAt: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      },
+    });
+
+    // Tính toán số lượng tồn và đã bán
+    const reportData = medicines.map((medicine) => {
+      const soldQuantity = invoices.reduce((total, invoice) => {
+        const soldMedicine = invoice.medicines.find(
+          (item) => item.medicineId.toString() === medicine._id.toString()
+        );
+        return total + (soldMedicine ? soldMedicine.quantity : 0);
+      }, 0);
+
+      return {
+        name: medicine.name,
+        stockQuantity: medicine.quantity,
+        soldQuantity,
+      };
+    });
+
+    res.status(200).json({ data: reportData });
+  } catch (error) {
+    console.error("Error fetching report by date:", error);
+    res.status(500).json({ message: "Lỗi hệ thống khi lấy dữ liệu thống kê." });
+  }
+};
+const getReportByCategory = async (req, res) => {
+  try {
+    // Lấy danh sách thuốc cùng danh mục của chúng
+    const medicines = await Medicine.find().populate("category", "name");
+
+    // Tính tổng số lượng thuốc cho từng danh mục
+    const categoryData = medicines.reduce((acc, medicine) => {
+      const categoryName = medicine.category?.name || "Chưa phân loại";
+      if (!acc[categoryName]) {
+        acc[categoryName] = 0;
+      }
+      acc[categoryName] += medicine.quantity;
+      return acc;
+    }, {});
+
+    // Chuyển đổi dữ liệu sang dạng mảng để dễ dàng xử lý
+    const result = Object.entries(categoryData).map(([name, quantity]) => ({
+      name,
+      quantity,
+    }));
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error fetching category report:", error);
+    res.status(500).json({ message: "Lỗi hệ thống khi lấy dữ liệu thống kê theo danh mục." });
+  }
+};
 
 module.exports = {
   getAllMedicines,
@@ -395,4 +466,6 @@ module.exports = {
   getImportHistory,
   sellMedicine, // Thêm bán thuốc
   searchMedicine,
+  getReportByDate,
+  getReportByCategory 
 };

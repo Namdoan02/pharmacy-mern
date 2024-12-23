@@ -26,14 +26,14 @@ const SIDEBAR_ITEMS = [
       { name: "Loại thuốc", icon: ShoppingBag, href: "/category-medicine" },
     ],
   },
-  { name: "Nhà cung cấp", icon: HousePlus, href: "/supplier" },
+  { name: "Nhà cung cấp", icon: HousePlus, href: "/supplier",roles: ["admin"] },
   { name: "Khách hàng", icon: UserRound, href: "/customers" },
-  { name: "Nhân viên", icon: Users, href: "/users" },
-  { name: "Báo cáo", icon: DollarSign, href: "/reports" },
+  { name: "Nhân viên", icon: Users, href: "/users",roles: ["admin"] },
+  { name: "Báo cáo", icon: DollarSign, href: "/reports",roles: ["admin"] },
   { name: "Hóa đơn", icon: ShoppingCart, href: "/order" },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({userRole}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState({});
   const location = useLocation();
@@ -68,8 +68,9 @@ const Sidebar = () => {
         </motion.button>
 
         <nav className="mt-8 flex-grow">
-          {SIDEBAR_ITEMS.map((item) => (
-            <div key={item.name}>
+        {SIDEBAR_ITEMS.map((item) => (
+            (!item.role || item.role.includes(userRole)) && (
+              <div key={item.name}>
               <Link to={item.href || "#"}>
                 <motion.div
                   onClick={() =>
@@ -141,6 +142,7 @@ const Sidebar = () => {
                 </motion.div>
               )}
             </div>
+            )
           ))}
         </nav>
       </div>
