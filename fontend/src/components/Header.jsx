@@ -118,19 +118,6 @@ const Header = ({ username, userRole, onLogout }) => {
           )}
         </div>
       </div>
-      <div className="bg-white p-4 rounded shadow mt-4 max-w-7xl mx-auto">
-      {searchResults.length > 0 ? (
-        <ul>
-          {searchResults.map((item, index) => (
-            <li key={index} className="border-b py-2">
-              {item.name || item.title || item.customerName} {/* Hiển thị thông tin theo mục */}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500">Không tìm thấy dữ liệu</p>
-      )}
-    </div>
     </header>
   );
 };
