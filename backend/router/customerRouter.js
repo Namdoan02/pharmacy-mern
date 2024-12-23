@@ -7,7 +7,7 @@ const {
   getAllCustomers,
   updateCustomer,
   deleteCustomer,
-  searchCustomers,
+  searchCustomer,
 } = require('../controllers/customerController');
 router.use(
     cors({
@@ -27,5 +27,5 @@ router.put('/update/:id', updateCustomer);
 // Xóa khách hàng
 router.delete('/delete/:id', deleteCustomer);
 
-router.get('/search', searchCustomers);
+router.get('/search',   searchCustomer);
 module.exports = router;

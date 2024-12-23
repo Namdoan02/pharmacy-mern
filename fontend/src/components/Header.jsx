@@ -3,7 +3,6 @@ import { useNavigate,useLocation  } from "react-router-dom";
 
 const Header = ({ username, userRole, onLogout }) => {
   const navigate = useNavigate();
-  const [searchResults, setSearchResults] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation(); // Lấy đường dẫn hiện tại
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +17,7 @@ const Header = ({ username, userRole, onLogout }) => {
         apiUrl = `http://localhost:5000/api/medicines/search?keyword=${searchQuery}`;
         break;
       case "/customers":
-        apiUrl = `http://localhost:5000/api/customers/search?keyword=${searchQuery}`;
+        apiUrl = `http://localhost:5000/api/customers/search?name=${name}`;
         break;
       case "/category-medicine":
         apiUrl = `http://localhost:5000/api/categories/search?keyword=${searchQuery}`;
@@ -32,8 +31,6 @@ const Header = ({ username, userRole, onLogout }) => {
       const response = await fetch(apiUrl); // Gọi API
       if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu");
   
-      const data = await response.json(); // Chuyển dữ liệu API về JSON
-      setSearchResults(data); // Lưu dữ liệu vào state
     } catch (error) {
       console.error("Lỗi tìm kiếm:", error);
     }

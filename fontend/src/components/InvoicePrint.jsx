@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { UserContext } from "../../context/usercontext"; // Đảm bảo bạn đang nhập đúng UserContext
 
-const InvoicePrint = ({ savedInvoice }) => {
+const InvoicePrint = ({ savedInvoice, isPrescription }) => {
   const { user, loading } = useContext(UserContext); // Lấy dữ liệu từ UserContext
 
   const printInvoice = () => {
@@ -23,6 +23,7 @@ const InvoicePrint = ({ savedInvoice }) => {
         <p><strong>Số điện thoại:</strong> ${savedInvoice.phoneNumber}</p>
         <p><strong>Nhân viên lập hóa đơn:</strong> ${user?.name || "Không xác định"}</p>
         <p><strong>Ngày giờ tạo hóa đơn:</strong> ${formattedDate}</p>
+        ${isPrescription ? '<p style="color: red;">(Hóa đơn kèm theo đơn thuốc)</p>' : '<p>(Hóa đơn không kèm đơn thuốc)</p>'}
         <table border="1" cellspacing="0" cellpadding="5" style="width: 100%; text-align: center; margin-top: 20px;">
           <thead>
             <tr>

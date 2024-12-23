@@ -5,7 +5,6 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
   const [supplierName, setSupplierName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [taxCode, setTaxCode] = useState("");
-  const [invoiceSymbol, setInvoiceSymbol] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
@@ -36,7 +35,6 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
         setSupplierName(supplierData.data.supplierName || "");
         setContactPerson(supplierData.data.contactPerson || "");
         setTaxCode(supplierData.data.taxCode || "");
-        setInvoiceSymbol(supplierData.data.invoiceSymbol || "");
         setEmail(supplierData.data.email || "");
         setPhoneNumber(supplierData.data.phoneNumber || "");
         setAddress(supplierData.data.address || "");
@@ -66,7 +64,6 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
       supplierName,
       contactPerson,
       taxCode,
-      invoiceSymbol,
       email,
       phoneNumber,
       address,
@@ -142,19 +139,7 @@ const EditSupplier = ({ supplierId, onClose, onSave }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium">
-              Ký hiệu hóa đơn
-            </label>
-            <input
-              type="text"
-              value={invoiceSymbol}
-              onChange={(e) => setInvoiceSymbol(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800"
-              placeholder="Nhập ký hiệu hóa đơn"
-              required
-            />
-          </div>
+          
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium">Email</label>
             <input

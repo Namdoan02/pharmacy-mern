@@ -45,21 +45,22 @@ function SupplierTable() {
       );
 
       if (response.ok) {
-        toast.success("Supplier updated successfully!");
+        toast.success("Cập nhật nhà cung cấp thành công!");
         setSuppliers((prev) =>
           prev.map((s) => (s._id === updatedSupplier._id ? updatedSupplier : s))
         );
         setIsEditModalOpen(false);
       } else {
-        toast.error("Failed to update supplier");
+        toast.error("Cập nhật nhà cung cấp thất bại");
       }
-    } catch (error) {
-      console.error("Error updating supplier:", error);
-      toast.error("Error updating supplier");
+        } catch (error) {
+      console.error("Lỗi khi cập nhật nhà cung cấp:", error);
+      toast.error("Lỗi khi cập nhật nhà cung cấp");
     }
   };
 
   const handleDelete = async (supplierId) => {
+    const deleteSupplier = async () => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/suppliers/delete/${supplierId}`,
@@ -68,14 +69,52 @@ function SupplierTable() {
 
       if (response.ok) {
         setSuppliers((prev) => prev.filter((s) => s._id !== supplierId));
-        toast.success("Supplier deleted successfully!");
+        toast.success("Xóa nhà cung cấp thành công!");
       } else {
-        toast.error("Failed to delete supplier");
-      }
-    } catch (error) {
-      console.error("Error deleting supplier:", error);
-      toast.error("Error deleting supplier");
+        toast.error("Xóa nhà cung cấp thất bại!");
+            }
+          } catch (error) {
+            console.error("Lỗi khi xóa nhà cung cấp:", error);
+            toast.error("Lỗi khi xóa nhà cung cấp");
     }
+  };
+    toast(
+      (t) => (
+        <div>
+          <p>Bạn có chắc muốn xóa khách hàng này?</p>
+          <div className="flex justify-center space-x-2 mt-2">
+            <button
+              onClick={() => {
+                deleteSupplier(); // Perform deletion
+                toast.dismiss(t.id); // Close the confirmation toast
+              }}
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+            >
+              Xác nhận
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)} // Close toast without action
+              className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+            >
+              Hủy
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-center",
+        duration: 5000,
+        closeOnClick: false,
+        draggable: false,
+        style: {
+          background: "#ffffff",
+          color: "#333",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          padding: "16px",
+        },
+      }
+    );
   };
 
   const totalPages = Math.ceil(suppliers.length / suppliersPerPage);

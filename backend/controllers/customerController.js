@@ -147,26 +147,26 @@ const searchCustomer = async (req, res) => {
       .json({ message: "Đã xảy ra lỗi khi tìm kiếm khách hàng." });
   }
 };
-const searchCustomers = async (req, res) => {
-  try {
-    const { search } = req.query;
+// const searchCustomers = async (req, res) => {
+//   try {
+//     const { search } = req.query;
 
-    const customers = await Customer.find({
-      $or: [
-        { name: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
-      ],
-    });
+//     const customers = await Customer.find({
+//       $or: [
+//         { name: { $regex: search, $options: "i" } },
+//         { phone: { $regex: search, $options: "i" } },
+//       ],
+//     });
 
-    res.status(200).json(customers);
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi tìm kiếm khách hàng", error });
-  }
-};
+//     res.status(200).json(customers);
+//   } catch (error) {
+//     res.status(500).json({ message: "Lỗi tìm kiếm khách hàng", error });
+//   }
+// };
 module.exports = {
   createCustomer,
   getAllCustomers,
   updateCustomer,
   deleteCustomer,
-  searchCustomers,
+  searchCustomer,
 };
